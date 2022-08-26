@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 
 function Table({ head, children, noActions }) {
 	return (
-		<div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg mt-8 mb-8 overflow-x-auto">
+		<div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg overflow-x-auto">
 			<table className="min-w-full divide-y divide-gray-200">
-				<thead className="bg-slate-200">
+				<thead className="bg-slate-100">
 					<tr>
 						{head.map((key, index) => (
 							<th

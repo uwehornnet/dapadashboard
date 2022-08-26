@@ -7,7 +7,7 @@ function AppWrapper({ children }) {
 			<div className="h-full lg:w-[240px]">
 				<Sidebar />
 			</div>
-			<div className="h-full flex-1 bg-zinc-50 overflow-hidden">
+			<div className="h-full flex-1 bg-white overflow-hidden">
 				<div className="h-full w-wull overflow-y-scroll">{children}</div>
 			</div>
 		</div>

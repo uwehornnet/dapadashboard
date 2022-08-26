@@ -1,12 +1,15 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import UserPage from "./pages/UserPage";
 
 const AppWrapper = React.lazy(() => import("./components/AppWrapper"));
-const LoginPage = React.lazy(() => import("./pages/LoginPage"));
-const HomePage = React.lazy(() => import("./pages/HomePage"));
-const SinglePage = React.lazy(() => import("./pages/SinglePage"));
-const DocumentPage = React.lazy(() => import("./pages/DocumentPage"));
+const LoginPage = React.lazy(() => import("./pages/auth/login.js"));
+const HomePage = React.lazy(() => import("./pages/home/index.js"));
+const DocumentPage = React.lazy(() => import("./pages/document/index.js"));
+const DocumentCreatePage = React.lazy(() => import("./pages/document/create.js"));
+const InvoicePage = React.lazy(() => import("./pages/invoice/index.js"));
+const InvoiceCreatePage = React.lazy(() => import("./pages/invoice/create.js"));
+const UserPage = React.lazy(() => import("./pages/user/index.js"));
+const UserCreatePage = React.lazy(() => import("./pages/user/create.js"));
 
 function App() {
 	return (
@@ -32,7 +35,7 @@ function App() {
 			/>
 			<Route
 				exact
-				path="/document"
+				path="/upload"
 				element={
 					<React.Suspense fallback={<>...</>}>
 						<AppWrapper>
@@ -42,16 +45,39 @@ function App() {
 				}
 			/>
 			<Route
-				exact={true}
-				path="/object/:id"
+				exact
+				path="/upload/create"
 				element={
 					<React.Suspense fallback={<>...</>}>
 						<AppWrapper>
-							<SinglePage />
+							<DocumentCreatePage />
 						</AppWrapper>
 					</React.Suspense>
 				}
 			/>
+			<Route
+				exact
+				path="/invoice"
+				element={
+					<React.Suspense fallback={<>...</>}>
+						<AppWrapper>
+							<InvoicePage />
+						</AppWrapper>
+					</React.Suspense>
+				}
+			/>
+			<Route
+				exact
+				path="/invoice/create"
+				element={
+					<React.Suspense fallback={<>...</>}>
+						<AppWrapper>
+							<InvoiceCreatePage />
+						</AppWrapper>
+					</React.Suspense>
+				}
+			/>
+
 			<Route
 				exact
 				path="/user"
@@ -59,6 +85,17 @@ function App() {
 					<React.Suspense fallback={<>...</>}>
 						<AppWrapper>
 							<UserPage />
+						</AppWrapper>
+					</React.Suspense>
+				}
+			/>
+			<Route
+				exact
+				path="/user/create"
+				element={
+					<React.Suspense fallback={<>...</>}>
+						<AppWrapper>
+							<UserCreatePage />
 						</AppWrapper>
 					</React.Suspense>
 				}

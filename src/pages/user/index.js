@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-import ActivityIndicator from "../components/ActivityIndicator";
-import SearchForm from "../components/SearchForm";
-import Table from "../components/Table";
-import Pagination from "../components/Pagination";
-import { useFetch } from "../hooks/useFetch";
+import ActivityIndicator from "../../components/ActivityIndicator";
+import SearchForm from "../../components/SearchForm";
+import Table from "../../components/Table";
+import Pagination from "../../components/Pagination";
+import { useFetch } from "../../hooks/useFetch";
 
 const TableRow = ({ index, id, name, email, role, location }) => {
 	return (
@@ -47,12 +47,16 @@ function UserPage() {
 	const [filter, setFilter] = useState(false);
 
 	return (
-		<div className="w-full h-full p-8">
-			<div className="flex flex-row justify-between items-center">
-				<h1 className="text-lg font-medium flex flex-row items-center">Benutzer</h1>
-				<div className="flex items-center space-x-2">
-					<Link to="/booking/create">
-						<span className="flex items-center py-2 px-4 bg-red-50 rounded-full cursor-pointer hover:bg-red-200 hover:text-red-600 text-red-400">
+		<div className="w-full h-full">
+			<div className="py-4 px-6 flex flex-row justify-between items-center bg-white sticky top-0 self-start">
+				<ul className="flex items-center justify-start gap-4 text-slate-600 text-sm">
+					<li>
+						<span className="text-slate-600">Benutzer</span>
+					</li>
+				</ul>
+				<div className="flex items-center space-x-6">
+					<Link to="/user/create">
+						<span className="flex items-center py-2 px-4 bg-indigo-100 rounded-lg cursor-pointer hover:bg-indigo-200 hover:text-indigo-600 text-indigo-400 shadow-sm">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								className="h-6 w-6 mr-2 "
@@ -67,14 +71,14 @@ function UserPage() {
 									d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
 								/>
 							</svg>
-							<span>neuer Eintrag</span>
+							<span>neuer Benutzer</span>
 						</span>
 					</Link>
 					<div className="relative">
 						<span className="cursor-pointer" onClick={() => setFilter(true)}>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
-								className="h-6 w-6 text-red-600"
+								className="h-6 w-6 text-indigo-600"
 								fill="none"
 								viewBox="0 0 24 24"
 								stroke="currentColor"
@@ -93,25 +97,27 @@ function UserPage() {
 				</div>
 			</div>
 
-			{loading ? (
-				<ActivityIndicator />
-			) : error ? (
-				<div>{JSON.stringify(error)}</div>
-			) : (
-				<div>
-					<Table head={["ID & Benutzer", "Standort", "Benutzerrolle"]}>
-						{data.data.map((link, i) => (
-							<TableRow key={i} index={i} {...link} />
-						))}
-					</Table>
+			<div className="p-4">
+				{loading ? (
+					<ActivityIndicator />
+				) : error ? (
+					<div>{JSON.stringify(error)}</div>
+				) : (
+					<div>
+						<Table head={["ID & Benutzer", "Standort", "Benutzerrolle"]}>
+							{data.data.map((link, i) => (
+								<TableRow key={i} index={i} {...link} />
+							))}
+						</Table>
 
-					<Pagination
-						{...data}
-						type="Benutzer"
-						onClick={(url) => setEndpoint(`/api/booking?${url.split("?")[1]}`)}
-					/>
-				</div>
-			)}
+						<Pagination
+							{...data}
+							type="Benutzer"
+							onClick={(url) => setEndpoint(`/api/booking?${url.split("?")[1]}`)}
+						/>
+					</div>
+				)}
+			</div>
 		</div>
 	);
 }

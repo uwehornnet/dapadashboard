@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-import ActivityIndicator from "../components/ActivityIndicator";
-import SearchForm from "../components/SearchForm";
-import Table from "../components/Table";
-import Pagination from "../components/Pagination";
-import { useFetch } from "../hooks/useFetch";
+import ActivityIndicator from "../../components/ActivityIndicator";
+import SearchForm from "../../components/SearchForm";
+import Table from "../../components/Table";
+import Pagination from "../../components/Pagination";
+import { useFetch } from "../../hooks/useFetch";
 
 const TableRow = ({ index }) => {
 	return (
@@ -52,9 +52,29 @@ function HomePage() {
 	const [filter, setFilter] = useState(false);
 
 	return (
-		<div className="w-full h-full p-8">
-			<div className="flex flex-row justify-between items-center">
-				<h1 className="text-lg font-medium flex flex-row items-center">Dashboard</h1>
+		<div className="w-full h-full">
+			<div className="flex flex-row justify-between items-center bg-white sticky top-0 self-start border-b border-neutral-200 px-6 py-4">
+				<ul className="flex items-center justify-start gap-4 text-slate-600 text-sm">
+					<li>
+						<span className="text-slate-600 flex items-center gap-2">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								className="h-4 w-4"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+								/>
+							</svg>
+							Dashboard
+						</span>
+					</li>
+				</ul>
 				<div className="flex items-center space-x-2">
 					<Link to="/booking/create">
 						<span className="flex items-center py-2 px-4 bg-red-50 rounded-full cursor-pointer hover:bg-red-200 hover:text-red-600 text-red-400">
@@ -98,25 +118,27 @@ function HomePage() {
 				</div>
 			</div>
 
-			{loading ? (
-				<ActivityIndicator />
-			) : error ? (
-				<div>{JSON.stringify(error)}</div>
-			) : (
-				<div>
-					<Table head={["ID", "Typ", "Preis", "erstellt am"]}>
-						{data.data.map((entry, i) => (
-							<TableRow key={i} index={i} {...entry} />
-						))}
-					</Table>
+			<div className="p-4">
+				{loading ? (
+					<ActivityIndicator />
+				) : error ? (
+					<div>{JSON.stringify(error)}</div>
+				) : (
+					<div>
+						<Table head={["ID", "Typ", "Preis", "erstellt am"]}>
+							{data.data.map((entry, i) => (
+								<TableRow key={i} index={i} {...entry} />
+							))}
+						</Table>
 
-					<Pagination
-						{...data}
-						type="Einträge"
-						onClick={(url) => setEndpoint(`/api/entry?${url.split("?")[1]}`)}
-					/>
-				</div>
-			)}
+						<Pagination
+							{...data}
+							type="Einträge"
+							onClick={(url) => setEndpoint(`/api/entry?${url.split("?")[1]}`)}
+						/>
+					</div>
+				)}
+			</div>
 		</div>
 	);
 }

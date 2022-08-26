@@ -2,7 +2,7 @@ import React from "react";
 import { Formik } from "formik";
 import { useNavigate } from "react-router-dom";
 
-import { baseURI } from "../utils/baseURI";
+import { baseURI } from "../../utils/baseURI";
 
 const LoginPage = () => {
 	const navigate = useNavigate();
