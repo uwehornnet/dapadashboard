@@ -1,9 +1,7 @@
-import { useEffect, useState } from "react";
-
 function Table({ head, children, noActions }) {
 	return (
-		<div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg overflow-x-auto">
-			<table className="min-w-full divide-y divide-gray-200">
+		<div className={`overflow-hidden overflow-x-auto `}>
+			<table className="min-w-full divide-y divide-gray-200 border-b border-slate-300">
 				<thead className="bg-slate-100">
 					<tr>
 						{head.map((key, index) => (

@@ -1,6 +1,6 @@
 function Pagination({ from, to, total, type, onClick, current_page, prev_page_url, next_page_url, path, links }) {
 	return links.length ? (
-		<div className="py-3 flex items-center justify-between mb-8">
+		<div className="py-3 flex items-center justify-between">
 			<div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
 				<div>
 					<p className="text-sm text-gray-700">

@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Formik } from "formik";
 import { useFetch } from "../../hooks/useFetch";
 import { baseURI } from "../../utils/baseURI";
 
-const INITIAL_VALUES = {
+let initialValues = {
+	status: "",
+	type: "",
+	file: "",
 	customer: "",
 	address: "",
 	subject: "",
@@ -27,6 +30,8 @@ const INITIAL_VALUES = {
 };
 
 const InvoiceCreatePage = () => {
+	const [searchParams] = useSearchParams();
+
 	const [submitting, isSubmitting] = useState(false);
 	const [endpoint, setEndpoint] = useState("/api/location");
 	const { loading, data, error } = useFetch({ endpoint });
@@ -77,8 +82,25 @@ const InvoiceCreatePage = () => {
 		}
 	};
 
+	const fetchFileAsync = async (id) => {
+		const req = await fetch(`${baseURI}/api/file/${id}`);
+		const res = await req.json();
+		const data = JSON.parse(res.data);
+		initialValues.file = id;
+		initialValues.items[0].position = `${data?.hersteller} ${data?.typ}`;
+		initialValues.items[0].description = `Hersteller: ${data?.hersteller}\nTyp: ${data?.typ}\nZulassung: ${data?.zulassung}\nSchlüsselnummer: ${data?.schluesselnummer}\nKraftstoff: ${data?.kraftstoff}\nHubraum: ${data?.hubraum}\nLeistung: ${data?.leistung}\nLeergewicht: ${data?.leergewicht}\nKFZ-Brief: ${data?.kfzbrief}`;
+	};
+
+	useEffect(() => {
+		if (searchParams.get("file")) {
+			fetchFileAsync(searchParams.get("file"));
+		}
+	}, [searchParams]);
+
+	console.log({ initialValues });
+
 	return (
-		<Formik initialValues={INITIAL_VALUES} onSubmit={handleFormSubmit}>
+		<Formik initialValues={initialValues} onSubmit={handleFormSubmit}>
 			{({ handleSubmit, setValues, values, setErrors, errors }) => (
 				<div className="w-full h-full flex flex-col justify-start">
 					<div className="p-4 bg-white sticky top-0 self-start  w-full flex items-center justify-between">
@@ -147,6 +169,43 @@ const InvoiceCreatePage = () => {
 					</div>
 					<div className="p-4 flex-1">
 						<div className="w-full bg-white flex-1 h-full mx-auto max-w-[1024px] shadow-lg border border-zinc-200 rounded-lg">
+							<div className="w-full border-b border-dashed border-neutral-300 p-4 bg-zinc-100">
+								<span className="bg-zinc-200 p-1 text-zinc-600 text-xs mb-6 inline-block">
+									Dokumentendetails
+								</span>
+								<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-16">
+									<div className="col-span-1">
+										<label className="text-sm mb-2 block">Typ</label>
+										<select
+											name=""
+											id="status"
+											value={values.status}
+											onChange={(e) => {
+												setValues({ ...values, status: e.target.value });
+											}}
+											className="p-2 bg-white border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
+										>
+											<option value="Gutschrift">Gutschrift</option>
+											<option value="Rechnung">Rechnung</option>
+										</select>
+									</div>
+									<div className="col-span-1">
+										<label className="text-sm mb-2 block">Status</label>
+										<select
+											name=""
+											id="status"
+											value={values.status}
+											onChange={(e) => {
+												setValues({ ...values, status: e.target.value });
+											}}
+											className="p-2 bg-white border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
+										>
+											<option value="preview">Entwurf</option>
+											<option value="saved">Festgeschrieben</option>
+										</select>
+									</div>
+								</div>
+							</div>
 							<div className="w-full border-b border-dashed border-neutral-300 p-4">
 								<span className="bg-zinc-200 p-1 text-zinc-600 text-xs mb-6 inline-block">
 									Kontakt- und Dokumentinformationen
@@ -234,176 +293,192 @@ const InvoiceCreatePage = () => {
 									</thead>
 									<tbody>
 										{values.items.map((item, index) => (
-											<tr key={index} className="">
-												<td className="p-2 w-[40px]">{index + 1}.</td>
-												<td className="p-2 flex-1">
-													<input
-														type="text"
-														className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
-														value={item.position}
-														onChange={(e) => {
-															setValues({
-																...values,
-																items: [
-																	...values.items.map((entry, i) => {
-																		if (i === index) {
-																			return {
-																				...entry,
-																				position: e.target.value,
-																			};
-																		}
-																		return entry;
-																	}),
-																],
-															});
-														}}
-													/>
-												</td>
-												<td className="p-2 w-[100px]">
-													<input
-														type="number"
-														min="0"
-														className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
-														value={item.qty}
-														onBlur={(e) => {
-															let t = 0;
-															values.items.forEach((entry, i) => {
-																if (i === index) {
-																	t += e.target.value * entry.price;
-																} else {
-																	t += entry.qty * entry.price;
-																}
-															});
-															setValues({
-																...values,
-																items: [
-																	...values.items.map((entry, i) => {
-																		if (i === index) {
-																			return {
-																				...entry,
-																				total: e.target.value * entry.price,
-																			};
-																		}
-																		return entry;
-																	}),
-																],
-																total: t,
-																tax: t * 1.19 - t,
-																netto: t * 1.19,
-															});
-														}}
-														onChange={(e) => {
-															setValues({
-																...values,
-																items: [
-																	...values.items.map((entry, i) => {
-																		if (i === index) {
-																			return {
-																				...entry,
-																				qty: e.target.value,
-																			};
-																		}
-																		return entry;
-																	}),
-																],
-															});
-														}}
-													/>
-												</td>
-												<td className="p-2 max-w-[100px]">
-													<input
-														type="number"
-														className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
-														value={item.price}
-														onBlur={(e) => {
-															let t = 0;
-															values.items.forEach((entry, i) => {
-																if (i === index) {
-																	t += e.target.value * entry.qty;
-																} else {
-																	t += entry.price * entry.qty;
-																}
-															});
-															setValues({
-																...values,
-																items: [
-																	...values.items.map((entry, i) => {
-																		if (i === index) {
-																			return {
-																				...entry,
-																				total: e.target.value * entry.qty,
-																			};
-																		}
-																		return entry;
-																	}),
-																],
-																total: t,
-																tax: t * 1.19 - t,
-																netto: t * 1.19,
-															});
-														}}
-														onChange={(e) => {
-															setValues({
-																...values,
-																items: [
-																	...values.items.map((entry, i) => {
-																		if (i === index) {
-																			return {
-																				...entry,
-																				price: e.target.value,
-																			};
-																		}
-																		return entry;
-																	}),
-																],
-															});
-														}}
-													/>
-												</td>
-												<td className="p-2 max-w-[80px]">
-													<input
-														type="text"
-														disabled
-														className="text-right p-2 w-full"
-														value={`${item.total.toFixed(2)} EUR`}
-													/>
-												</td>
-												<td>
-													<span
-														className="cursor-pointer text-blue-400 hover:text-blue-700"
-														onClick={() => {
-															let t = 0;
-															values.items.forEach((entry, i) => {
-																if (i !== index) {
-																	t += entry.total;
-																}
-															});
-															setValues({
-																...values,
-																items: values.items.filter((_, i) => i !== index),
-																total: t,
-																tax: t * 1.19 - t,
-																netto: t * 1.19,
-															});
-														}}
-													>
-														<svg
-															xmlns="http://www.w3.org/2000/svg"
-															fill="none"
-															viewBox="0 0 24 24"
-															strokeWidth={1.5}
-															stroke="currentColor"
-															className="w-5 h-5"
+											<>
+												<tr key={index} className="">
+													<td className="p-2 w-[40px]">{index + 1}.</td>
+													<td className="p-2 flex-1">
+														<input
+															type="text"
+															className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
+															value={item.position}
+															onChange={(e) => {
+																setValues({
+																	...values,
+																	items: [
+																		...values.items.map((entry, i) => {
+																			if (i === index) {
+																				return {
+																					...entry,
+																					position: e.target.value,
+																				};
+																			}
+																			return entry;
+																		}),
+																	],
+																});
+															}}
+														/>
+													</td>
+													<td className="p-2 w-[100px]">
+														<input
+															type="number"
+															min="0"
+															className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
+															value={item.qty}
+															onBlur={(e) => {
+																let t = 0;
+																values.items.forEach((entry, i) => {
+																	if (i === index) {
+																		t += e.target.value * entry.price;
+																	} else {
+																		t += entry.qty * entry.price;
+																	}
+																});
+																setValues({
+																	...values,
+																	items: [
+																		...values.items.map((entry, i) => {
+																			if (i === index) {
+																				return {
+																					...entry,
+																					total: e.target.value * entry.price,
+																				};
+																			}
+																			return entry;
+																		}),
+																	],
+																	total: t,
+																	tax: t * 1.19 - t,
+																	netto: t * 1.19,
+																});
+															}}
+															onChange={(e) => {
+																setValues({
+																	...values,
+																	items: [
+																		...values.items.map((entry, i) => {
+																			if (i === index) {
+																				return {
+																					...entry,
+																					qty: e.target.value,
+																				};
+																			}
+																			return entry;
+																		}),
+																	],
+																});
+															}}
+														/>
+													</td>
+													<td className="p-2 max-w-[100px]">
+														<input
+															type="number"
+															className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
+															value={item.price}
+															onBlur={(e) => {
+																let t = 0;
+																values.items.forEach((entry, i) => {
+																	if (i === index) {
+																		t += e.target.value * entry.qty;
+																	} else {
+																		t += entry.price * entry.qty;
+																	}
+																});
+																setValues({
+																	...values,
+																	items: [
+																		...values.items.map((entry, i) => {
+																			if (i === index) {
+																				return {
+																					...entry,
+																					total: e.target.value * entry.qty,
+																				};
+																			}
+																			return entry;
+																		}),
+																	],
+																	total: t,
+																	tax: t * 1.19 - t,
+																	netto: t * 1.19,
+																});
+															}}
+															onChange={(e) => {
+																setValues({
+																	...values,
+																	items: [
+																		...values.items.map((entry, i) => {
+																			if (i === index) {
+																				return {
+																					...entry,
+																					price: e.target.value,
+																				};
+																			}
+																			return entry;
+																		}),
+																	],
+																});
+															}}
+														/>
+													</td>
+													<td className="p-2 max-w-[80px]">
+														<input
+															type="text"
+															disabled
+															className="text-right p-2 w-full"
+															value={`${item.total.toFixed(2)} EUR`}
+														/>
+													</td>
+													<td>
+														<span
+															className="cursor-pointer text-blue-400 hover:text-blue-700"
+															onClick={() => {
+																let t = 0;
+																values.items.forEach((entry, i) => {
+																	if (i !== index) {
+																		t += entry.total;
+																	}
+																});
+																setValues({
+																	...values,
+																	items: values.items.filter((_, i) => i !== index),
+																	total: t,
+																	tax: t * 1.19 - t,
+																	netto: t * 1.19,
+																});
+															}}
 														>
-															<path
-																strokeLinecap="round"
-																strokeLinejoin="round"
-																d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-															/>
-														</svg>
-													</span>
-												</td>
-											</tr>
+															<svg
+																xmlns="http://www.w3.org/2000/svg"
+																fill="none"
+																viewBox="0 0 24 24"
+																strokeWidth={1.5}
+																stroke="currentColor"
+																className="w-5 h-5"
+															>
+																<path
+																	strokeLinecap="round"
+																	strokeLinejoin="round"
+																	d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+																/>
+															</svg>
+														</span>
+													</td>
+												</tr>
+												<tr>
+													<td></td>
+													<td colSpan={5} className="p-2">
+														<textarea
+															name="desription"
+															id="desription"
+															className="min-h-[160px] p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
+															value={item.description}
+															onChange={(e) =>
+																setValues({ ...values, description: e.target.value })
+															}
+														></textarea>
+													</td>
+												</tr>
+											</>
 										))}
 									</tbody>
 								</table>

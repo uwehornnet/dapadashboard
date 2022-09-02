@@ -44,8 +44,8 @@ const TableRow = ({ index, id, uid, total, customer }) => {
 	);
 };
 
-function InvoicePage() {
-	const [endpoint, setEndpoint] = useState(`/api/invoice`);
+function CustomerPage() {
+	const [endpoint, setEndpoint] = useState(`/api/customer`);
 	const { loading, error, data } = useFetch({ endpoint });
 
 	const innerRender = () => {
@@ -63,11 +63,11 @@ function InvoicePage() {
 							<path
 								strokeLinecap="round"
 								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
+								strokeWidth={1.5}
+								d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
 							/>
 						</svg>
-						Rechnungen
+						Kunden
 					</span>
 				</li>
 			</ul>
@@ -79,10 +79,10 @@ function InvoicePage() {
 			<div className="border border-slate-300 rounded-lg  mx-auto bg-white">
 				<div className="p-4 border-b border-zinc-300 flex items-center justify-between">
 					<div>
-						<h2 className="text-xl">Rechnungen</h2>
-						<p className="text-slate-400">Übersicht aller Rechnungen</p>
+						<h2 className="text-xl">Kunden</h2>
+						<p className="text-slate-400">Übersicht aller Kunden in der Datenbank</p>
 					</div>
-					<Link to="/invoice/create">
+					<Link to="/customer/create">
 						<button className="flex items-center gap-2 cursor-pointer hover:bg-slate-100 px-6 py-3 rounded-lg">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -98,7 +98,7 @@ function InvoicePage() {
 									d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 002.25-2.25V6a2.25 2.25 0 00-2.25-2.25H6A2.25 2.25 0 003.75 6v2.25A2.25 2.25 0 006 10.5zm0 9.75h2.25A2.25 2.25 0 0010.5 18v-2.25a2.25 2.25 0 00-2.25-2.25H6a2.25 2.25 0 00-2.25 2.25V18A2.25 2.25 0 006 20.25zm9.75-9.75H18a2.25 2.25 0 002.25-2.25V6A2.25 2.25 0 0018 3.75h-2.25A2.25 2.25 0 0013.5 6v2.25a2.25 2.25 0 002.25 2.25z"
 								/>
 							</svg>
-							neue Rechnung
+							Kunden anlegen
 						</button>
 					</Link>
 				</div>
@@ -119,8 +119,8 @@ function InvoicePage() {
 						<div className="p-4">
 							<Pagination
 								{...data}
-								type="Rechnungen"
-								onClick={(url) => setEndpoint(`/api/invoice?${url.split("?")[1]}`)}
+								type="Kunden"
+								onClick={(url) => setEndpoint(`/api/customer?${url.split("?")[1]}`)}
 							/>
 						</div>
 					</div>
@@ -130,4 +130,4 @@ function InvoicePage() {
 	);
 }
 
-export default InvoicePage;
+export default CustomerPage;

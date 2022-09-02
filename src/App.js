@@ -4,12 +4,18 @@ import { Routes, Route } from "react-router-dom";
 const AppWrapper = React.lazy(() => import("./components/AppWrapper"));
 const LoginPage = React.lazy(() => import("./pages/auth/login.js"));
 const HomePage = React.lazy(() => import("./pages/home/index.js"));
-const DocumentPage = React.lazy(() => import("./pages/document/index.js"));
-const DocumentCreatePage = React.lazy(() => import("./pages/document/create.js"));
+const EntryCreatePage = React.lazy(() => import("./pages/entry/create.js"));
+const EntryUpdatePage = React.lazy(() => import("./pages/entry/update.js"));
 const InvoicePage = React.lazy(() => import("./pages/invoice/index.js"));
 const InvoiceCreatePage = React.lazy(() => import("./pages/invoice/create.js"));
-const UserPage = React.lazy(() => import("./pages/user/index.js"));
-const UserCreatePage = React.lazy(() => import("./pages/user/create.js"));
+const UserPage = React.lazy(() => import("./pages/settings/user/index.js"));
+const UserCreatePage = React.lazy(() => import("./pages/settings/user/create.js"));
+const SettingsPage = React.lazy(() => import("./pages/settings/index.js"));
+const ProfileSettings = React.lazy(() => import("./pages/settings/profile/index.js"));
+const Locations = React.lazy(() => import("./pages/settings/location/index.js"));
+const LocationCreate = React.lazy(() => import("./pages/settings/location/create.js"));
+const CustomerPage = React.lazy(() => import("./pages/customer/index.js"));
+const CustomerCreatePage = React.lazy(() => import("./pages/customer/create.js"));
 
 function App() {
 	return (
@@ -35,22 +41,22 @@ function App() {
 			/>
 			<Route
 				exact
-				path="/upload"
+				path="/entry/create"
 				element={
 					<React.Suspense fallback={<>...</>}>
 						<AppWrapper>
-							<DocumentPage />
+							<EntryCreatePage />
 						</AppWrapper>
 					</React.Suspense>
 				}
 			/>
 			<Route
 				exact
-				path="/upload/create"
+				path="/entry/update/:id"
 				element={
 					<React.Suspense fallback={<>...</>}>
 						<AppWrapper>
-							<DocumentCreatePage />
+							<EntryUpdatePage />
 						</AppWrapper>
 					</React.Suspense>
 				}
@@ -80,22 +86,91 @@ function App() {
 
 			<Route
 				exact
-				path="/user"
+				path="/customer"
 				element={
 					<React.Suspense fallback={<>...</>}>
 						<AppWrapper>
-							<UserPage />
+							<CustomerPage />
 						</AppWrapper>
 					</React.Suspense>
 				}
 			/>
 			<Route
 				exact
-				path="/user/create"
+				path="/customer/create"
 				element={
 					<React.Suspense fallback={<>...</>}>
 						<AppWrapper>
-							<UserCreatePage />
+							<CustomerCreatePage />
+						</AppWrapper>
+					</React.Suspense>
+				}
+			/>
+			<Route
+				exact
+				path="/settings"
+				element={
+					<React.Suspense fallback={<>...</>}>
+						<AppWrapper>
+							<SettingsPage>
+								<ProfileSettings />
+							</SettingsPage>
+						</AppWrapper>
+					</React.Suspense>
+				}
+			/>
+
+			<Route
+				exact
+				path="/settings/location"
+				element={
+					<React.Suspense fallback={<>...</>}>
+						<AppWrapper>
+							<SettingsPage>
+								<Locations />
+							</SettingsPage>
+						</AppWrapper>
+					</React.Suspense>
+				}
+			/>
+
+			<Route
+				exact
+				path="/settings/location/create"
+				element={
+					<React.Suspense fallback={<>...</>}>
+						<AppWrapper>
+							<SettingsPage>
+								<LocationCreate />
+							</SettingsPage>
+						</AppWrapper>
+					</React.Suspense>
+				}
+			/>
+
+			<Route
+				exact
+				path="/settings/user"
+				element={
+					<React.Suspense fallback={<>...</>}>
+						<AppWrapper>
+							<SettingsPage>
+								<UserPage />
+							</SettingsPage>
+						</AppWrapper>
+					</React.Suspense>
+				}
+			/>
+
+			<Route
+				exact
+				path="/settings/user/create"
+				element={
+					<React.Suspense fallback={<>...</>}>
+						<AppWrapper>
+							<SettingsPage>
+								<UserCreatePage />
+							</SettingsPage>
 						</AppWrapper>
 					</React.Suspense>
 				}

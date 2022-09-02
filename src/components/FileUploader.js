@@ -8,8 +8,8 @@ const FileUploader = () => {
 	return (
 		<Formik initialValues={{ file: null }} onSubmit={handleFileUpload}>
 			{({ handleSubmit, setFieldValue }) => (
-				<form className="block w-full">
-					<label className="w-full min-h-[240px] bg-blue-100/50 rounded-md border-4 border-blue-900/60 border-dashed flex items-center justify-center cursor-copy">
+				<form className="block w-full flex-1 h-full">
+					<label className="w-full min-h-[240px] h-[100%] bg-blue-100/50 rounded-md border-4 border-blue-900/60 border-dashed flex items-center justify-center cursor-copy">
 						<input
 							id="file"
 							name="file"
