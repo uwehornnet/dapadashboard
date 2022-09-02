@@ -8,7 +8,7 @@ import { useFetch } from "../../../hooks/useFetch";
 
 const TableRow = ({ index, id, name, zip_code, city, address }) => {
 	return (
-		<tr className={index % 2 == 0 ? null : "bg-gray-50"}>
+		<tr className={index % 2 === 0 ? null : "bg-gray-50"}>
 			<td className="px-6 py-4 whitespace-nowrap">
 				<div className="text-sm font-medium text-gray-900">{id}</div>
 			</td>

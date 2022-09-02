@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { Formik } from "formik";
 import { useFetch } from "../../hooks/useFetch";
 import { baseURI } from "../../utils/baseURI";
@@ -33,8 +33,8 @@ const InvoiceCreatePage = () => {
 	const [searchParams] = useSearchParams();
 
 	const [submitting, isSubmitting] = useState(false);
-	const [endpoint, setEndpoint] = useState("/api/location");
-	const { loading, data, error } = useFetch({ endpoint });
+	const endpoint = "/api/location";
+	const { loading, data: location, error } = useFetch({ endpoint });
 
 	const handleFormSubmit = async (values) => {
 		try {
@@ -97,76 +97,10 @@ const InvoiceCreatePage = () => {
 		}
 	}, [searchParams]);
 
-	console.log({ initialValues });
-
 	return (
 		<Formik initialValues={initialValues} onSubmit={handleFormSubmit}>
 			{({ handleSubmit, setValues, values, setErrors, errors }) => (
 				<div className="w-full h-full flex flex-col justify-start">
-					<div className="p-4 bg-white sticky top-0 self-start  w-full flex items-center justify-between">
-						<ul className="flex items-center justify-start gap-4 text-slate-600 text-sm">
-							<li>
-								<Link to="/invoice">
-									<span className="text-slate-600 flex items-center gap-2">
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											className="h-4 w-4"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-										>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
-											/>
-										</svg>
-										Rechnungen
-									</span>
-								</Link>
-							</li>
-							<li>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									fill="none"
-									viewBox="0 0 24 24"
-									strokeWidth={4}
-									stroke="currentColor"
-									className="w-2 h-2"
-								>
-									<path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-								</svg>
-							</li>
-							<li>
-								<span className="text-slate-300">Rechnung erstellen</span>
-							</li>
-						</ul>
-						<ul className="flex items-center justify-end text-sm space-x-6">
-							<li>
-								<span
-									onClick={handleSubmit}
-									className="px-4 py-3 bg-indigo-200 text-indigo-700 hover:bg-indigo-600 hover:text-indigo-100 hover:shadow-lg shadow-sm rounded-md cursor-pointer flex items-center space-x-4"
-								>
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										fill="none"
-										viewBox="0 0 24 24"
-										strokeWidth={2}
-										stroke="currentColor"
-										className="w-5 h-5 mr-3"
-									>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											d="M9 3.75H6.912a2.25 2.25 0 00-2.15 1.588L2.35 13.177a2.25 2.25 0 00-.1.661V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 00-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859M12 3v8.25m0 0l-3-3m3 3l3-3"
-										/>
-									</svg>
-									Als Entwurf speichern
-								</span>
-							</li>
-						</ul>
-					</div>
 					<div className="p-4 flex-1">
 						<div className="w-full bg-white flex-1 h-full mx-auto max-w-[1024px] shadow-lg border border-zinc-200 rounded-lg">
 							<div className="w-full border-b border-dashed border-neutral-300 p-4 bg-zinc-100">
@@ -540,6 +474,29 @@ const InvoiceCreatePage = () => {
 									<p>Gesamt</p>
 									<p>{values.netto.toFixed(2)} Euro</p>
 								</div>
+							</div>
+
+							<div className="w-full p-4 border-t border-slate-300 flex items-center justify-end">
+								<button
+									onClick={handleSubmit}
+									className="px-4 py-3 bg-indigo-200 text-indigo-700 hover:bg-indigo-600 hover:text-indigo-100 hover:shadow-lg shadow-sm rounded-md cursor-pointer flex items-center space-x-4"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										fill="none"
+										viewBox="0 0 24 24"
+										strokeWidth={2}
+										stroke="currentColor"
+										className="w-5 h-5 mr-3"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											d="M9 3.75H6.912a2.25 2.25 0 00-2.15 1.588L2.35 13.177a2.25 2.25 0 00-.1.661V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 00-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859M12 3v8.25m0 0l-3-3m3 3l3-3"
+										/>
+									</svg>
+									speichern
+								</button>
 							</div>
 						</div>
 					</div>

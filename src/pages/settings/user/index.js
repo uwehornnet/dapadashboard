@@ -8,7 +8,7 @@ import { useFetch } from "../../../hooks/useFetch";
 
 const TableRow = ({ index, id, name, email, role, location }) => {
 	return (
-		<tr className={index % 2 == 0 ? null : "bg-gray-50"}>
+		<tr className={index % 2 === 0 ? null : "bg-gray-50"}>
 			<td className="px-6 py-4 whitespace-nowrap">
 				<div className="flex items-center">
 					<div className="flex-shrink-0 text-sm">{id}</div>
@@ -43,7 +43,6 @@ const TableRow = ({ index, id, name, email, role, location }) => {
 function UserPage() {
 	const [endpoint, setEndpoint] = useState("/api/user");
 	const { loading, data, error } = useFetch({ endpoint });
-	const [filter, setFilter] = useState(false);
 
 	return (
 		<div className="border border-slate-300 rounded-lg  mx-auto bg-white">

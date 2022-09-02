@@ -5,11 +5,10 @@ import ActivityIndicator from "../../components/ActivityIndicator";
 import Table from "../../components/Table";
 import Pagination from "../../components/Pagination";
 import { useFetch } from "../../hooks/useFetch";
-import Inner from "../../components/Inner";
 
 const TableRow = ({ index, id, uid, total, customer }) => {
 	return (
-		<tr className={index % 2 == 0 ? null : "bg-gray-50"}>
+		<tr className={index % 2 === 0 ? null : "bg-gray-50"}>
 			<td className="px-6 py-4 whitespace-nowrap">
 				<div className="flex items-center">
 					<div className="flex-shrink-0 text-sm">{id}</div>
@@ -29,7 +28,7 @@ const TableRow = ({ index, id, uid, total, customer }) => {
 			</td>
 
 			<td className="px-6 py-4 whitespace-nowrap">
-				{index % 2 == 0 ? (
+				{index % 2 === 0 ? (
 					<span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
 						Buchung
 					</span>
@@ -48,34 +47,8 @@ function CustomerPage() {
 	const [endpoint, setEndpoint] = useState(`/api/customer`);
 	const { loading, error, data } = useFetch({ endpoint });
 
-	const innerRender = () => {
-		return (
-			<ul className="flex items-center justify-start gap-4 text-slate-600 text-sm">
-				<li>
-					<span className="text-slate-600 flex items-center gap-2">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							className="h-4 w-4"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={1.5}
-								d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-							/>
-						</svg>
-						Kunden
-					</span>
-				</li>
-			</ul>
-		);
-	};
-
 	return (
-		<Inner render={innerRender}>
+		<div className="p-4">
 			<div className="border border-slate-300 rounded-lg  mx-auto bg-white">
 				<div className="p-4 border-b border-zinc-300 flex items-center justify-between">
 					<div>
@@ -126,7 +99,7 @@ function CustomerPage() {
 					</div>
 				)}
 			</div>
-		</Inner>
+		</div>
 	);
 }
 
