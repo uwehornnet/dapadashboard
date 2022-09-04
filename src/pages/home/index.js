@@ -6,7 +6,7 @@ import Table from "../../components/Table";
 import Pagination from "../../components/Pagination";
 import { useFetch } from "../../hooks/useFetch";
 
-const TableRow = ({ index, id, data, invoice }) => {
+const TableRow = ({ index, id, data, status }) => {
 	const navigate = useNavigate();
 	const { kennzeichen, hersteller, typ, kraftstoff, standort } = data ? JSON.parse(data) : {};
 	return (
@@ -34,21 +34,15 @@ const TableRow = ({ index, id, data, invoice }) => {
 			</td>
 
 			<td className="px-6 py-4 whitespace-nowrap">
-				{invoice ? (
-					<span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-						Verkauft
-					</span>
-				) : (
-					<span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-500">
-						auf Lager
-					</span>
-				)}
+				<span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+					{status}
+				</span>
 			</td>
 
 			<td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-end items-center space-x-4 text-slate-500">
 				<span
 					className="cursor-pointer hover:text-slate-900"
-					onClick={() => navigate(`/invoice/create?file=${id}`)}
+					onClick={() => navigate(`/invoice/create?entry=${id}`)}
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -89,7 +83,7 @@ const TableRow = ({ index, id, data, invoice }) => {
 };
 
 function HomePage() {
-	const [endpoint, setEndpoint] = useState(`/api/files`);
+	const [endpoint, setEndpoint] = useState(`/api/entry`);
 	const { loading, error, data } = useFetch({ endpoint });
 
 	return (

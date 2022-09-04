@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Formik } from "formik";
 
 import ActivityIndicator from "../../components/ActivityIndicator";
 import { baseURI } from "../../utils/baseURI";
 import { useFetch } from "../../hooks/useFetch";
-import { locations, status } from "../../utils/config";
+import { status } from "../../utils/config";
 
 function EntryUpdatePage() {
 	const { id } = useParams();
-	const { loading, error, data: file } = useFetch({ endpoint: `/api/file/${id}` });
+	const navigate = useNavigate();
+	const [fetching, setFetching] = useState(false);
+	const [locations, setLocations] = useState([]);
+	const { loading, error, data: entry } = useFetch({ endpoint: `/api/entry/${id}` });
 	const [initialValues, setInitialValues] = useState({
-		standort: "",
 		status: "",
+		standort: "",
 		kennzeichen: "",
 		halter: "",
 		zulassung: "",
@@ -24,37 +27,82 @@ function EntryUpdatePage() {
 		leistung: "",
 		leergewicht: "",
 		kfzbrief: "",
+		file: null,
 	});
 
 	const handleSubmitAsync = async (values) => {
 		try {
-			const req = await fetch(`${baseURI}/api/file/update/${id}`, {
+			if (fetching) return;
+			setFetching(true);
+			let filename = "";
+			let path = "";
+			console.log(values);
+			if (values.file && values.file.length !== 0) {
+				const formData = new FormData();
+				formData.append("file", values.file);
+
+				const uploadReq = await fetch(`${baseURI}/api/entry/upload`, {
+					method: "POST",
+					body: formData,
+				});
+				const uploadRes = await uploadReq.json();
+
+				filename = uploadRes.data.filename;
+				path = uploadRes.data.path;
+			}
+
+			const req = await fetch(`${baseURI}/api/entry/update/${id}`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({ data: values }),
+				body: JSON.stringify({
+					data: values,
+					filename,
+					path,
+					location: values.standort,
+					status: values.status,
+				}),
 			});
 			const res = await req.json();
-			console.log({ res });
+			if (res.ok) {
+				return navigate(`/`);
+			}
+
+			setFetching(false);
 		} catch (err) {
 			console.log(err);
 		}
 	};
 
 	useEffect(() => {
-		if (file) {
-			setInitialValues({ ...JSON.parse(file.data) });
+		if (entry) {
+			console.log({ entry });
+			setInitialValues({ ...JSON.parse(entry.data) });
 		}
-	}, [file]);
+	}, [entry]);
+
+	useEffect(() => {
+		(async () => {
+			try {
+				const req = await fetch(`${baseURI}/api/location`);
+				const res = await req.json();
+				setLocations(res.data);
+			} catch (err) {
+				console.log(err);
+			}
+		})();
+	}, []);
 
 	return (
 		<div className="w-full h-full">
 			<Formik initialValues={initialValues} onSubmit={handleSubmitAsync} enableReinitialize>
 				{({ handleSubmit, setValues, values }) => (
 					<>
-						{loading ? (
-							<ActivityIndicator />
+						{fetching || loading ? (
+							<div className="p-8">
+								<ActivityIndicator />
+							</div>
 						) : error ? (
 							<div className="p-8">
 								<h2>Upppps, Error occured</h2>
@@ -62,17 +110,51 @@ function EntryUpdatePage() {
 							</div>
 						) : (
 							<div className="flex w-full flex-col lg:flex-row gap-8 bg-slate-50">
-								<div className="flex-1 p-8 sticky top-16 self-start">
+								<div className="flex-1 p-8 lg:sticky lg:top-16 lg:self-start">
 									<label className="text-sm mb-2 block">Upload</label>
-									<div className="border border-zinc-200 p-4 flex items-center justify-center bg-white">
-										<img
-											src={`http://${file?.filename}`}
-											alt={file?.filename}
-											className="w-full h-auto 16/9"
-										/>
-									</div>
+									{entry.filename ? (
+										<div className="border border-zinc-200 p-4 flex items-center justify-center bg-white">
+											<img
+												src={`http://${entry?.filename}`}
+												alt={entry?.filename}
+												className="w-full h-auto 16/9"
+											/>
+										</div>
+									) : (
+										<label className="w-full min-h-[240px] h-[100%] bg-blue-100/50 rounded-md border-4 border-blue-900/60 border-dashed flex items-center justify-center cursor-copy">
+											<input
+												id="file"
+												name="file"
+												type="file"
+												onChange={(e) => {
+													setValues({
+														...values,
+														file: e.target.files[0],
+													});
+												}}
+												className="form-control hidden"
+											/>
+											<span className="text-blue-900/60 uppercase text-2xl tracking-widest font-medium flex items-center gap-4">
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													fill="none"
+													viewBox="0 0 24 24"
+													strokeWidth={2}
+													stroke="currentColor"
+													className="w-8 h-8"
+												>
+													<path
+														strokeLinecap="round"
+														strokeLinejoin="round"
+														d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"
+													/>
+												</svg>
+												upload file
+											</span>
+										</label>
+									)}
 								</div>
-								<div className="lg:w-[400px] border-l border-slate-300 bg-white">
+								<div className="lg:w-[400px] border-t lg:border-l border-slate-300 bg-white">
 									<div className="p-4 border-b border-dashed border-slate-300">
 										<span className="bg-zinc-200 p-1 text-zinc-600 text-xs mb-6 inline-block">
 											Standort
@@ -86,12 +168,9 @@ function EntryUpdatePage() {
 											}}
 											className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
 										>
-											<option value="Standort wählen" disabled>
-												Standort wählen
-											</option>
-											{locations.map((l) => (
-												<option value={l} key={l}>
-													{l}
+											{locations.map((location) => (
+												<option value={location.id} key={location.id}>
+													{location.name}
 												</option>
 											))}
 										</select>
@@ -222,6 +301,26 @@ function EntryUpdatePage() {
 											onChange={(e) => setValues({ ...values, kfzbrief: e.target.value })}
 											className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
 										/>
+										<button
+											onClick={handleSubmit}
+											className="mt-8 px-4 py-3 bg-indigo-200 text-indigo-700 hover:bg-indigo-600 hover:text-indigo-100 hover:shadow-lg shadow-sm rounded-md cursor-pointer flex items-center space-x-4"
+										>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												fill="none"
+												viewBox="0 0 24 24"
+												strokeWidth={2}
+												stroke="currentColor"
+												className="w-5 h-5 mr-3"
+											>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													d="M9 3.75H6.912a2.25 2.25 0 00-2.15 1.588L2.35 13.177a2.25 2.25 0 00-.1.661V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 00-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859M12 3v8.25m0 0l-3-3m3 3l3-3"
+												/>
+											</svg>
+											aktuallisieren
+										</button>
 									</div>
 								</div>
 							</div>

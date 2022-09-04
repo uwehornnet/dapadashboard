@@ -16,6 +16,7 @@ const Locations = React.lazy(() => import("./pages/settings/location/index.js"))
 const LocationCreate = React.lazy(() => import("./pages/settings/location/create.js"));
 const CustomerPage = React.lazy(() => import("./pages/customer/index.js"));
 const CustomerCreatePage = React.lazy(() => import("./pages/customer/create.js"));
+const CustomerUpdatePage = React.lazy(() => import("./pages/customer/update.js"));
 
 function App() {
 	return (
@@ -102,6 +103,17 @@ function App() {
 					<React.Suspense fallback={<>...</>}>
 						<AppWrapper>
 							<CustomerCreatePage />
+						</AppWrapper>
+					</React.Suspense>
+				}
+			/>
+			<Route
+				exact
+				path="/customer/update/:id"
+				element={
+					<React.Suspense fallback={<>...</>}>
+						<AppWrapper>
+							<CustomerUpdatePage />
 						</AppWrapper>
 					</React.Suspense>
 				}

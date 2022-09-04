@@ -18,7 +18,11 @@ export const useFetch = ({ endpoint, payload }) => {
 				headers: headersList,
 			});
 			const res = await req.json();
-			setData(res);
+			if (res.ok) {
+				setData(res.data);
+			} else {
+				setError(res.data);
+			}
 			setLoading(false);
 		} catch (err) {
 			setError(err);
@@ -34,7 +38,12 @@ export const useFetch = ({ endpoint, payload }) => {
 				body: JSON.stringify(payload),
 			});
 			const res = await req.json();
-			setData(res);
+			if (res.ok) {
+				setData(res.data);
+			} else {
+				setError(res.data);
+			}
+
 			setLoading(false);
 		} catch (err) {
 			setError(err);

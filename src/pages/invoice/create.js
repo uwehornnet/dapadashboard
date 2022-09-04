@@ -83,7 +83,7 @@ const InvoiceCreatePage = () => {
 	};
 
 	const fetchFileAsync = async (id) => {
-		const req = await fetch(`${baseURI}/api/file/${id}`);
+		const req = await fetch(`${baseURI}/api/entry/${id}`);
 		const res = await req.json();
 		const data = JSON.parse(res.data);
 		initialValues.file = id;
@@ -92,8 +92,8 @@ const InvoiceCreatePage = () => {
 	};
 
 	useEffect(() => {
-		if (searchParams.get("file")) {
-			fetchFileAsync(searchParams.get("file"));
+		if (searchParams.get("entry")) {
+			fetchFileAsync(searchParams.get("entry"));
 		}
 	}, [searchParams]);
 
@@ -111,11 +111,11 @@ const InvoiceCreatePage = () => {
 									<div className="col-span-1">
 										<label className="text-sm mb-2 block">Typ</label>
 										<select
-											name=""
-											id="status"
-											value={values.status}
+											name="type"
+											id="type"
+											value={values.type}
 											onChange={(e) => {
-												setValues({ ...values, status: e.target.value });
+												setValues({ ...values, type: e.target.value });
 											}}
 											className="p-2 bg-white border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
 										>
@@ -126,7 +126,7 @@ const InvoiceCreatePage = () => {
 									<div className="col-span-1">
 										<label className="text-sm mb-2 block">Status</label>
 										<select
-											name=""
+											name="status"
 											id="status"
 											value={values.status}
 											onChange={(e) => {

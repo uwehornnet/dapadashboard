@@ -1,26 +1,41 @@
+import { useState } from "react";
 import { Formik, Form, Field } from "formik";
+import { baseURI } from "../../utils/baseURI";
 
 const CustomerCreatePage = () => {
-	const onUserFormSubmit = (values) => {};
+	const [loading, setLoading] = useState(false);
+	const onUserFormSubmit = async (values) => {
+		if (loading) return;
+		setLoading(true);
+		const req = await fetch(`${baseURI}/api/customer/create`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(values),
+		});
+		const res = await req.json();
+		setLoading(false);
+		console.log({ res });
+	};
 
 	return (
 		<div className="max-w-[800px] mx-auto border border-zinc-300 rounded-lg bg-white">
 			<Formik
 				initialValues={{
-					username: "",
+					name: "",
 					email: "",
-					oldPassword: "",
-					password: "",
+					address: "",
 				}}
 				onSubmit={onUserFormSubmit}
 			>
-				{({ values, isSubmitting }) => {
+				{({ values, isSubmitting, setValues }) => {
 					return (
 						<Form>
 							<div className="p-4 border-b border-zinc-300 flex items-center justify-between">
 								<div>
-									<h2 className="text-xl">Benutzereinstellungen</h2>
-									<p className="text-slate-400">Ändere deine Benutzereinstellungen</p>
+									<h2 className="text-xl">Kunden anlegen</h2>
+									<p className="text-slate-400">Füge einen neuen Kunden in die Kundendatenbank ein</p>
 								</div>
 
 								<button
@@ -47,13 +62,34 @@ const CustomerCreatePage = () => {
 							</div>
 							<div className="px-4 py-6">
 								<div className="mb-6">
-									<label className="text-xs uppercase text-slate-600 font-medium">Benutzername</label>
+									<label className="text-xs uppercase text-slate-600 font-medium">Name</label>
 									<Field
 										type="text"
-										name="useranme"
-										value={values?.username}
-										placeholder="Benutzername"
+										name="name"
+										value={values?.name}
 										className="border border-slate-200 p-2 rounded-md block w-full"
+										onChange={(e) =>
+											setValues({
+												...values,
+												name: e.target.value,
+											})
+										}
+									/>
+								</div>
+								<div className="mb-6">
+									<label className="w-full text-xs uppercase text-slate-600 font-medium">
+										Anschrift
+									</label>
+									<textarea
+										name="address"
+										value={values?.address}
+										className="border border-slate-200 p-2 rounded-md block w-full min-h-[160px]"
+										onChange={(e) =>
+											setValues({
+												...values,
+												address: e.target.value,
+											})
+										}
 									/>
 								</div>
 								<div className="mb-6">
@@ -64,42 +100,14 @@ const CustomerCreatePage = () => {
 										type="text"
 										name="email"
 										value={values?.email}
-										placeholder="Emailadresse"
 										className="border border-slate-200 p-2 rounded-md block w-full"
+										onChange={(e) =>
+											setValues({
+												...values,
+												email: e.target.value,
+											})
+										}
 									/>
-								</div>
-								<div className="mb-6">
-									<label className="w-full text-xs uppercase text-slate-600 font-medium">
-										Passwort
-									</label>
-									<Field
-										type="text"
-										name="password"
-										value={values?.password}
-										placeholder="Passwort"
-										className="border border-slate-200 p-2 rounded-md block w-full"
-									/>
-								</div>
-								<div>
-									<label className="w-full text-xs uppercase text-slate-600 font-medium">
-										altes Passwort
-									</label>
-									<Field
-										type="password"
-										name="oldPassword"
-										value={values?.oldPassword}
-										placeholder="altes Passwort"
-										className="border border-slate-200 p-2 rounded-md block w-full"
-									/>
-								</div>
-								<div className="mt-16">
-									<label className="w-full text-xs uppercase text-slate-600 font-medium block">
-										Benutzerrolle
-									</label>
-									<select className="appearance-none border border-slate-200 p-2 rounded-md block w-full">
-										<option value="admin">Admin</option>
-										<option value="user">User</option>
-									</select>
 								</div>
 							</div>
 						</Form>
