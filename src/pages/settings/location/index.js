@@ -65,19 +65,25 @@ const Locations = () => {
 				<div>{JSON.stringify(error)}</div>
 			) : (
 				<div>
-					<Table head={["ID", "Name", "Adresse"]} className="sm:rounded-0">
-						{data.data.map((entry, i) => (
-							<TableRow key={i} index={i} {...entry} />
-						))}
-					</Table>
+					{data.data.length ? (
+						<>
+							<Table head={["ID", "Name", "Adresse"]} className="sm:rounded-0">
+								{data.data.map((entry, i) => (
+									<TableRow key={i} index={i} {...entry} />
+								))}
+							</Table>
 
-					<div className="p-4">
-						<Pagination
-							{...data}
-							type="Standorte"
-							onClick={(url) => setEndpoint(`/api/location?${url.split("?")[1]}`)}
-						/>
-					</div>
+							<div className="p-4">
+								<Pagination
+									{...data}
+									type="Standorte"
+									onClick={(url) => setEndpoint(`/api/location?${url.split("?")[1]}`)}
+								/>
+							</div>
+						</>
+					) : (
+						<img src="/empty.jpg" className="mx-auto" />
+					)}
 				</div>
 			)}
 		</div>

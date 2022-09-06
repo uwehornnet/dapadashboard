@@ -1,44 +1,43 @@
 import { useEffect, useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Formik } from "formik";
 import { useFetch } from "../../hooks/useFetch";
 import { baseURI } from "../../utils/baseURI";
 
-let initialValues = {
-	status: "",
-	type: "",
-	file: "",
-	customerId: "",
-	customer: "",
-	address: "",
-	subject: "",
-	uid: "",
-	date: "",
-	headText:
-		"Sehr geehrte Damen und Herren,\n\nvielen Dank für Ihren Auftrag und das damit verbundene Vertrauen! Hiermit stelle ich Ihnen die folgenden Leistungen in Rechnung:",
-	footText:
-		"Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf das unten angegebene Konto. Der Rechnungsbetrag ist sofort fällig.\n\nMit freundlichen Grüßen",
-	items: [
-		{
-			position: "",
-			qty: 1,
-			price: 0,
-			total: 0,
-			description: "",
-		},
-	],
-	total: 0,
-	tax: 0,
-	netto: 0,
-};
-
-const InvoiceCreatePage = () => {
-	const [searchParams] = useSearchParams();
+const InvoiceUpdatePage = () => {
+	const { id } = useParams();
 	const navigate = useNavigate();
+	const [initialValues, setInitialValues] = useState({
+		status: "",
+		type: "",
+		file: "",
+		customerId: "",
+		customer: "",
+		address: "",
+		subject: "",
+		uid: "",
+		date: "",
+		headText:
+			"Sehr geehrte Damen und Herren,\n\nvielen Dank für Ihren Auftrag und das damit verbundene Vertrauen! Hiermit stelle ich Ihnen die folgenden Leistungen in Rechnung:",
+		footText:
+			"Bitte überweisen Sie den Rechnungsbetrag unter Angabe der Rechnungsnummer auf das unten angegebene Konto. Der Rechnungsbetrag ist sofort fällig.\n\nMit freundlichen Grüßen",
+		items: [
+			{
+				position: "",
+				qty: 1,
+				price: 0,
+				total: 0,
+				description: "",
+			},
+		],
+		total: 0,
+		tax: 0,
+		netto: 0,
+	});
+
 	const [submitting, isSubmitting] = useState(false);
-	const [modal, showModal] = useState(false);
-	const { loading, data: location, error } = useFetch({ endpoint: "/api/location" });
-	const { loading: customerLoading, data: customer, eror: customerError } = useFetch({ endpoint: "/api/customer" });
+	const [disabled, setDiabled] = useState(false);
+	const { loading, data: invoice, error } = useFetch({ endpoint: `/api/invoice/${id}` });
 
 	const handleFormSubmit = async (values) => {
 		try {
@@ -46,35 +45,16 @@ const InvoiceCreatePage = () => {
 				return;
 			}
 			isSubmitting(true);
-			// create contact
-			let customer;
-			if (!values.customerId) {
-				const customerReq = await fetch(`${baseURI}/api/customer/create`, {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						name: values.customer,
-						address: values.address,
-					}),
-				});
-				const customerRes = await customerReq.json();
-				customer = customerRes.data.id;
-			} else {
-				customer = values.customerId;
-			}
 
 			// create document
 
-			const invoice = await fetch(`${baseURI}/api/invoice/create`, {
+			const invoice = await fetch(`${baseURI}/api/invoice/update/${id}`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					customer: customer,
-					type: values.type,
+					customer: values.customerId,
 					subject: values.subject,
 					uid: values.uid,
 					date: values.date,
@@ -83,11 +63,13 @@ const InvoiceCreatePage = () => {
 					items: values.items,
 					total: values.total,
 					tax: values.tax,
-					entry: searchParams.get("entry"),
+					type: values.type,
+					status: values.status,
+					entry: values.entry,
 				}),
 			}).then((res) => res.json());
 
-			window.alert(`Rechnung ${invoice.data.uid} wurde erstellt.`);
+			window.alert(`Rechnung ${invoice.data.uid} wurde aktualisiert.`);
 			isSubmitting(false);
 			navigate("/invoice");
 		} catch (err) {
@@ -96,87 +78,35 @@ const InvoiceCreatePage = () => {
 		}
 	};
 
-	const fetchFileAsync = async (id) => {
-		const req = await fetch(`${baseURI}/api/entry/${id}`);
-		const res = await req.json();
-		const data = JSON.parse(res.data.data);
-		initialValues.file = id;
-		initialValues.items[0].position = `${data?.hersteller} ${data?.typ}`;
-		initialValues.items[0].description = `Hersteller: ${data?.hersteller}\nTyp: ${data?.typ}\nZulassung: ${data?.zulassung}\nSchlüsselnummer: ${data?.schluesselnummer}\nKraftstoff: ${data?.kraftstoff}\nHubraum: ${data?.hubraum}\nLeistung: ${data?.leistung}\nLeergewicht: ${data?.leergewicht}\nKFZ-Brief: ${data?.kfzbrief}`;
+	const fetchInvoiceAsync = async () => {
+		try {
+			const req = await fetch(`${baseURI}/api/invoice/${id}`);
+			const res = await req.json();
+
+			setInitialValues({
+				...initialValues,
+				...res.data.invoice,
+				customer: res.data.customer.name,
+				customerId: res.data.customer.id,
+				address: res.data.customer.address,
+				items: JSON.parse(res.data.invoice.items),
+				netto: res.data.invoice.total + res.data.invoice.tax,
+			});
+
+			setDiabled(res.data.invoice.status === "saved");
+		} catch (err) {
+			console.log(err);
+		}
 	};
 
 	useEffect(() => {
-		if (searchParams.get("entry")) {
-			fetchFileAsync(searchParams.get("entry"));
-		}
-	}, [searchParams]);
+		fetchInvoiceAsync();
+	}, [invoice]);
 
 	return (
-		<Formik initialValues={initialValues} onSubmit={handleFormSubmit}>
+		<Formik initialValues={initialValues} onSubmit={handleFormSubmit} enableReinitialize>
 			{({ handleSubmit, setValues, values, setErrors, errors }) => (
 				<div className="w-full h-full flex flex-col justify-start">
-					{modal && (
-						<div className="w-full h-full fixed top-0 left-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center">
-							<div className="bg-white border-slate-300 rounded-md lg:w-[400px]">
-								<div className="p-4 flex items-center justify-between border-b border-slate-300">
-									<h2 className="text-xl font-semibold">Kunden suchen</h2>
-									<span onClick={() => showModal(false)} className="cursor-pointer">
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											fill="none"
-											viewBox="0 0 24 24"
-											strokeWidth={1.5}
-											stroke="currentColor"
-											className="w-6 h-6"
-										>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												d="M6 18L18 6M6 6l12 12"
-											/>
-										</svg>
-									</span>
-								</div>
-								<div className="p-4">
-									<label className="text-sm mb-2 block">Kunde</label>
-									<select
-										name="type"
-										id="type"
-										value={values.customerId}
-										onChange={(e) => {
-											console.log({
-												ev: e.target.value,
-												customer: customer.data,
-											});
-											const selectedCustomer = customer.data.find((c) => c.id == e.target.value);
-											setValues({
-												...values,
-												customerId: selectedCustomer.id,
-												customer: selectedCustomer.name,
-												address: selectedCustomer.address,
-											});
-										}}
-										className="p-2 bg-white border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
-									>
-										<option value="">Kunde wählen</option>
-										{customer.data.map((c) => (
-											<option key={c.id} value={c.id}>
-												{c.name}
-											</option>
-										))}
-									</select>
-								</div>
-								<div className="p-4 border-t border-slate-300">
-									<span
-										className="w-full text-indigo-800 bg-indigo-300 p-4 text-center block font-medium uppercase text-xs tracking-wider cursor-pointer rounded-sm"
-										onClick={() => showModal(false)}
-									>
-										übernehmen
-									</span>
-								</div>
-							</div>
-						</div>
-					)}
 					<div className="p-4 flex-1">
 						<div className="w-full bg-white flex-1 h-full mx-auto max-w-[1024px] shadow-lg border border-zinc-200 rounded-lg">
 							<div className="w-full border-b border-dashed border-neutral-300 p-4 bg-zinc-100">
@@ -187,14 +117,18 @@ const InvoiceCreatePage = () => {
 									<div className="col-span-1">
 										<label className="text-sm mb-2 block">Typ</label>
 										<select
+											disabled={disabled}
 											name="type"
 											id="type"
 											value={values.type}
 											onChange={(e) => {
 												setValues({ ...values, type: e.target.value });
 											}}
-											className="p-2 bg-white border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
+											className="p-2 bg-white border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none disabled:cursor-not-allowed disabled:text-zinc-300"
 										>
+											<option disabled value="">
+												bitte wählen
+											</option>
 											<option value="Gutschrift">Gutschrift</option>
 											<option value="Rechnung">Rechnung</option>
 										</select>
@@ -202,14 +136,18 @@ const InvoiceCreatePage = () => {
 									<div className="col-span-1">
 										<label className="text-sm mb-2 block">Status</label>
 										<select
+											disabled={disabled}
 											name="status"
 											id="status"
 											value={values.status}
 											onChange={(e) => {
 												setValues({ ...values, status: e.target.value });
 											}}
-											className="p-2 bg-white border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
+											className="p-2 bg-white border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none disabled:cursor-not-allowed disabled:text-zinc-300"
 										>
+											<option disabled value="">
+												bitte wählen
+											</option>
 											<option value="preview">Entwurf</option>
 											<option value="saved">Festgeschrieben</option>
 										</select>
@@ -223,66 +161,53 @@ const InvoiceCreatePage = () => {
 								<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-16">
 									<div className="col-span-1">
 										<label className="text-sm mb-2 block">Kunde</label>
-										<div className="flex items-center border border-neutral-200 rounded-sm">
-											<input
-												type="text"
-												value={values.customer}
-												onChange={(e) => setValues({ ...values, customer: e.target.value })}
-												className="p-2 bg-transparent block w-full focus:ring-0 focus:outline-none"
-											/>
-											<span className="p-2 cursor-pointer" onClick={() => showModal(true)}>
-												<svg
-													xmlns="http://www.w3.org/2000/svg"
-													fill="none"
-													viewBox="0 0 24 24"
-													strokeWidth={1.5}
-													stroke="currentColor"
-													className="w-6 h-6"
-												>
-													<path
-														strokeLinecap="round"
-														strokeLinejoin="round"
-														d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-													/>
-												</svg>
-											</span>
-										</div>
+										<input
+											disabled={disabled}
+											type="text"
+											value={values.customer}
+											onChange={(e) => setValues({ ...values, customer: e.target.value })}
+											className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none disabled:cursor-not-allowed disabled:text-zinc-300"
+										/>
 										<label className="text-sm mb-2 mt-4 block">Anschrift</label>
 										<textarea
+											disabled={disabled}
 											name="address"
 											id="address"
 											placeholder="Adresse"
 											value={values.address}
 											onChange={(e) => setValues({ ...values, address: e.target.value })}
-											className="p-2 min-h-[100px] w-full border border-neutral-200 rounded-sm text-sm"
+											className="p-2 min-h-[100px] w-full border border-neutral-200 rounded-sm text-sm disabled:cursor-not-allowed disabled:text-zinc-300"
 										></textarea>
 									</div>
 									<div className="col-span-1">
 										<label className="text-sm mb-2 block">Betreff</label>
 										<input
+											disabled={disabled}
 											type="text"
 											value={values.subject}
 											onChange={(e) => setValues({ ...values, subject: e.target.value })}
-											className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
+											className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none disabled:cursor-not-allowed disabled:text-zinc-300"
 										/>
 
 										<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
 											<div className="col-span-1">
 												<label className="text-sm mb-2 block">Nummer</label>
 												<input
+													disabled={disabled}
 													type="text"
 													value={values.uid}
 													onChange={(e) => setValues({ ...values, uid: e.target.value })}
-													className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
+													className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none disabled:cursor-not-allowed disabled:text-zinc-300"
 												/>
 											</div>
 											<div className="col-span-1">
 												<label className="text-sm mb-2 block">Leistungszeitraum</label>
 												<input
+													disabled={disabled}
 													type="text"
 													value={values.date}
 													onChange={(e) => setValues({ ...values, date: e.target.value })}
-													className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
+													className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none disabled:cursor-not-allowed disabled:text-zinc-300"
 												/>
 											</div>
 										</div>
@@ -295,12 +220,13 @@ const InvoiceCreatePage = () => {
 									Kopftext
 								</span>
 								<textarea
+									disabled={disabled}
 									name="headtext"
 									id="headtext"
 									placeholder="Anschreiben"
 									value={values.headText}
 									onChange={(e) => setValues({ ...values, headText: e.target.value })}
-									className="p-2 min-h-[100px] w-full border border-neutral-200 rounded-sm text-sm"
+									className="p-2 min-h-[100px] w-full border border-neutral-200 rounded-sm text-sm disabled:cursor-not-allowed disabled:text-zinc-300"
 								></textarea>
 							</div>
 
@@ -322,12 +248,13 @@ const InvoiceCreatePage = () => {
 									<tbody>
 										{values.items.map((item, index) => (
 											<>
-												<tr key={index} className="">
+												<tr>
 													<td className="p-2 w-[40px]">{index + 1}.</td>
 													<td className="p-2 flex-1">
 														<input
+															disabled={disabled}
 															type="text"
-															className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
+															className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none disabled:cursor-not-allowed disabled:text-zinc-300"
 															value={item.position}
 															onChange={(e) => {
 																setValues({
@@ -349,9 +276,10 @@ const InvoiceCreatePage = () => {
 													</td>
 													<td className="p-2 w-[100px]">
 														<input
+															disabled={disabled}
 															type="number"
 															min="0"
-															className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
+															className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none disabled:cursor-not-allowed disabled:text-zinc-300"
 															value={item.qty}
 															onBlur={(e) => {
 																let t = 0;
@@ -400,8 +328,9 @@ const InvoiceCreatePage = () => {
 													</td>
 													<td className="p-2 max-w-[100px]">
 														<input
+															disabled={disabled}
 															type="number"
-															className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
+															className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none disabled:cursor-not-allowed disabled:text-zinc-300"
 															value={item.price}
 															onBlur={(e) => {
 																let t = 0;
@@ -458,7 +387,7 @@ const InvoiceCreatePage = () => {
 													</td>
 													<td>
 														<span
-															className="cursor-pointer text-blue-400 hover:text-blue-700"
+															className="cursor-pointer text-blue-400 hover:text-blue-700 disabled:cursor-not-allowed disabled:text-zinc-300"
 															onClick={() => {
 																let t = 0;
 																values.items.forEach((entry, i) => {
@@ -496,15 +425,13 @@ const InvoiceCreatePage = () => {
 													<td></td>
 													<td colSpan={5} className="p-2">
 														<textarea
+															disabled={disabled}
 															name="desription"
 															id="desription"
-															className="min-h-[160px] p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
+															className="min-h-[160px] p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none disabled:cursor-not-allowed disabled:text-zinc-300"
 															value={item.description}
 															onChange={(e) =>
-																setValues({
-																	...values,
-																	description: e.target.value,
-																})
+																setValues({ ...values, description: e.target.value })
 															}
 														></textarea>
 													</td>
@@ -515,7 +442,8 @@ const InvoiceCreatePage = () => {
 								</table>
 
 								<button
-									className="mt-8 text-blue-500 font-medium uppercase text-xs tracking-wider flex items-center space-x-6"
+									className="mt-8 text-blue-500 font-medium uppercase text-xs tracking-wider flex items-center space-x-6 disabled:cursor-not-allowed disabled:text-zinc-300"
+									disabled={disabled}
 									onClick={() =>
 										setValues({
 											...values,
@@ -549,12 +477,13 @@ const InvoiceCreatePage = () => {
 							<div className="w-full border-b border-dashed border-neutral-300 p-4">
 								<span className="bg-zinc-200 p-1 text-zinc-600 text-xs mb-6 inline-block">Fußtext</span>
 								<textarea
+									disabled={disabled}
 									name="foottext"
 									id="foottext"
 									placeholder="Bemerkung"
 									value={values.footText}
 									onChange={(e) => setValues({ ...values, footText: e.target.value })}
-									className="p-2 min-h-[100px] w-full border border-neutral-200 rounded-sm text-sm"
+									className="p-2 min-h-[100px] w-full border border-neutral-200 rounded-sm text-sm disabled:cursor-not-allowed disabled:text-zinc-300"
 								></textarea>
 							</div>
 
@@ -575,8 +504,10 @@ const InvoiceCreatePage = () => {
 
 							<div className="w-full p-4 border-t border-slate-300 flex items-center justify-end">
 								<button
+									disabled={disabled}
+									type="submit"
 									onClick={handleSubmit}
-									className="px-4 py-3 bg-indigo-200 text-indigo-700 hover:bg-indigo-600 hover:text-indigo-100 hover:shadow-lg shadow-sm rounded-md cursor-pointer flex items-center space-x-4"
+									className="px-4 py-3 bg-indigo-200 text-indigo-700 hover:bg-indigo-600 hover:text-indigo-100 hover:shadow-lg shadow-sm rounded-md cursor-pointer flex items-center space-x-4 disabled:text-zinc-500 disabled:bg-zinc-200 disabled:cursor-not-allowed"
 								>
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
@@ -603,4 +534,4 @@ const InvoiceCreatePage = () => {
 	);
 };
 
-export default InvoiceCreatePage;
+export default InvoiceUpdatePage;

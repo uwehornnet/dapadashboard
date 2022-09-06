@@ -83,7 +83,7 @@ function EntryCreatePage() {
 			try {
 				const req = await fetch(`${baseURI}/api/location`);
 				const res = await req.json();
-				setLocations(res.data);
+				setLocations(res.data.data);
 			} catch (err) {
 				console.log(err);
 			}
@@ -153,6 +153,9 @@ function EntryCreatePage() {
 											}}
 											className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
 										>
+											<option value="" disabled>
+												Bitte wählen
+											</option>
 											{locations.map((location) => (
 												<option value={location.id} key={location.id}>
 													{location.name}
@@ -173,8 +176,8 @@ function EntryCreatePage() {
 											}}
 											className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
 										>
-											<option value="Standort wählen" disabled>
-												Status wählen
+											<option value="" disabled>
+												Bitte wählen
 											</option>
 											{status.map((s) => (
 												<option value={s} key={s}>

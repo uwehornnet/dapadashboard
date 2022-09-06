@@ -36,7 +36,6 @@ function EntryUpdatePage() {
 			setFetching(true);
 			let filename = "";
 			let path = "";
-			console.log(values);
 			if (values.file && values.file.length !== 0) {
 				const formData = new FormData();
 				formData.append("file", values.file);
@@ -87,7 +86,7 @@ function EntryUpdatePage() {
 			try {
 				const req = await fetch(`${baseURI}/api/location`);
 				const res = await req.json();
-				setLocations(res.data);
+				setLocations(res.data.data);
 			} catch (err) {
 				console.log(err);
 			}

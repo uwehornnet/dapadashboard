@@ -1,25 +1,49 @@
 import { Formik, Form, Field } from "formik";
+import { baseURI } from "../../../utils/baseURI";
+import { useNavigate } from "react-router-dom";
 
 const LocationCreatePage = () => {
-	const onUserFormSubmit = (values) => {};
+	const navigate = useNavigate();
+	const onUserFormSubmit = async (values) => {
+		const req = await fetch(`${baseURI}/api/location/create`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				name: values.name,
+				address: values.address,
+				zip_code: values.zipCode,
+				city: values.city,
+			}),
+		});
+		const res = await req.json();
+		console.log(res);
+		if (res.ok) {
+			alert("Neuer Standort wurde erfolgreich erstellt!");
+			navigate("/settings/location");
+		} else {
+			alert("Uppps, ein Fehler ist aufgetreten " + res.data);
+		}
+	};
 	return (
 		<div className="max-w-[800px] mx-auto border border-zinc-300 rounded-lg bg-white">
 			<Formik
 				initialValues={{
-					username: "",
-					email: "",
-					oldPassword: "",
-					password: "",
+					name: "",
+					address: "",
+					zipCode: "",
+					city: "",
 				}}
 				onSubmit={onUserFormSubmit}
 			>
-				{({ values, isSubmitting }) => {
+				{({ values, isSubmitting, setValues }) => {
 					return (
 						<Form>
 							<div className="p-4 border-b border-zinc-300 flex items-center justify-between">
 								<div>
-									<h2 className="text-xl">Benutzereinstellungen</h2>
-									<p className="text-slate-400">Ändere deine Benutzereinstellungen</p>
+									<h2 className="text-xl">Standorte</h2>
+									<p className="text-slate-400">Erstelle einen neuen Standort</p>
 								</div>
 
 								<button
@@ -46,59 +70,58 @@ const LocationCreatePage = () => {
 							</div>
 							<div className="px-4 py-6">
 								<div className="mb-6">
-									<label className="text-xs uppercase text-slate-600 font-medium">Benutzername</label>
+									<label className="text-xs uppercase text-slate-600 font-medium">Name</label>
 									<Field
 										type="text"
-										name="useranme"
-										value={values?.username}
-										placeholder="Benutzername"
+										name="name"
+										value={values?.name}
+										placeholder="Name"
 										className="border border-slate-200 p-2 rounded-md block w-full"
+										onChange={(e) => {
+											setValues({ ...values, name: e.target.value });
+										}}
 									/>
 								</div>
 								<div className="mb-6">
 									<label className="w-full text-xs uppercase text-slate-600 font-medium">
-										Email Adresse
+										Strasse und Hausnummer
 									</label>
 									<Field
 										type="text"
-										name="email"
-										value={values?.email}
-										placeholder="Emailadresse"
+										name="address"
+										value={values?.address}
+										placeholder="Strasse und Hausnummer"
 										className="border border-slate-200 p-2 rounded-md block w-full"
+										onChange={(e) => {
+											setValues({ ...values, address: e.target.value });
+										}}
 									/>
 								</div>
 								<div className="mb-6">
-									<label className="w-full text-xs uppercase text-slate-600 font-medium">
-										Passwort
-									</label>
+									<label className="w-full text-xs uppercase text-slate-600 font-medium">PLZ</label>
 									<Field
 										type="text"
-										name="password"
-										value={values?.password}
-										placeholder="Passwort"
+										name="PLZ"
+										value={values?.zipCode}
+										placeholder="Postleitzahl"
 										className="border border-slate-200 p-2 rounded-md block w-full"
+										onChange={(e) => {
+											setValues({ ...values, zipCode: e.target.value });
+										}}
 									/>
 								</div>
 								<div>
-									<label className="w-full text-xs uppercase text-slate-600 font-medium">
-										altes Passwort
-									</label>
+									<label className="w-full text-xs uppercase text-slate-600 font-medium">Stadt</label>
 									<Field
-										type="password"
-										name="oldPassword"
-										value={values?.oldPassword}
-										placeholder="altes Passwort"
+										type="text"
+										name="city"
+										value={values?.city}
+										placeholder="Stadt"
 										className="border border-slate-200 p-2 rounded-md block w-full"
+										onChange={(e) => {
+											setValues({ ...values, city: e.target.value });
+										}}
 									/>
-								</div>
-								<div className="mt-16">
-									<label className="w-full text-xs uppercase text-slate-600 font-medium block">
-										Benutzerrolle
-									</label>
-									<select className="appearance-none border border-slate-200 p-2 rounded-md block w-full">
-										<option value="admin">Admin</option>
-										<option value="user">User</option>
-									</select>
 								</div>
 							</div>
 						</Form>

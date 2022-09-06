@@ -13,6 +13,7 @@ export const useFetch = ({ endpoint, payload }) => {
 
 	const getDataAsync = async ({ endpoint }) => {
 		try {
+			setLoading(true);
 			const req = await fetch(`${baseURI}${endpoint}`, {
 				method: "GET",
 				headers: headersList,
@@ -32,6 +33,7 @@ export const useFetch = ({ endpoint, payload }) => {
 
 	const postDataAsync = async ({ endpoint, payload }) => {
 		try {
+			setLoading(true);
 			const req = await fetch(`${baseURI}${endpoint}`, {
 				method: "POST",
 				headers: headersList,

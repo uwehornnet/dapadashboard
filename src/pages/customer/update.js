@@ -58,10 +58,8 @@ const CustomerUpdatePage = () => {
 								<Form>
 									<div className="p-4 border-b border-zinc-300 flex items-center justify-between">
 										<div>
-											<h2 className="text-xl">Kunden anlegen</h2>
-											<p className="text-slate-400">
-												Füge einen neuen Kunden in die Kundendatenbank ein
-											</p>
+											<h2 className="text-xl">Kunden berabeiten</h2>
+											<p className="text-slate-400">Aktualisiere Kundendaten.</p>
 										</div>
 
 										<button

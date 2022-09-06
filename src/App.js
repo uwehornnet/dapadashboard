@@ -8,6 +8,7 @@ const EntryCreatePage = React.lazy(() => import("./pages/entry/create.js"));
 const EntryUpdatePage = React.lazy(() => import("./pages/entry/update.js"));
 const InvoicePage = React.lazy(() => import("./pages/invoice/index.js"));
 const InvoiceCreatePage = React.lazy(() => import("./pages/invoice/create.js"));
+const InvoiceUpdatePage = React.lazy(() => import("./pages/invoice/update.js"));
 const UserPage = React.lazy(() => import("./pages/settings/user/index.js"));
 const UserCreatePage = React.lazy(() => import("./pages/settings/user/create.js"));
 const SettingsPage = React.lazy(() => import("./pages/settings/index.js"));
@@ -80,6 +81,18 @@ function App() {
 					<React.Suspense fallback={<>...</>}>
 						<AppWrapper>
 							<InvoiceCreatePage />
+						</AppWrapper>
+					</React.Suspense>
+				}
+			/>
+
+			<Route
+				exact
+				path="/invoice/update/:id"
+				element={
+					<React.Suspense fallback={<>...</>}>
+						<AppWrapper>
+							<InvoiceUpdatePage />
 						</AppWrapper>
 					</React.Suspense>
 				}

@@ -10,10 +10,11 @@ const ProfileSettings = () => {
 					email: "",
 					oldPassword: "",
 					password: "",
+					role: "",
 				}}
 				onSubmit={onUserFormSubmit}
 			>
-				{({ values, isSubmitting }) => {
+				{({ values, isSubmitting, setValues }) => {
 					return (
 						<Form>
 							<div className="p-4 border-b border-zinc-300 flex items-center justify-between">
@@ -53,6 +54,12 @@ const ProfileSettings = () => {
 										value={values?.username}
 										placeholder="Benutzername"
 										className="border border-slate-200 p-2 rounded-md block w-full"
+										onChange={(e) =>
+											setValues({
+												...values,
+												username: e.target.value,
+											})
+										}
 									/>
 								</div>
 								<div className="mb-6">
@@ -65,6 +72,12 @@ const ProfileSettings = () => {
 										value={values?.email}
 										placeholder="Emailadresse"
 										className="border border-slate-200 p-2 rounded-md block w-full"
+										onChange={(e) =>
+											setValues({
+												...values,
+												email: e.target.value,
+											})
+										}
 									/>
 								</div>
 								<div className="mb-6">
@@ -77,6 +90,12 @@ const ProfileSettings = () => {
 										value={values?.password}
 										placeholder="Passwort"
 										className="border border-slate-200 p-2 rounded-md block w-full"
+										onChange={(e) =>
+											setValues({
+												...values,
+												password: e.target.value,
+											})
+										}
 									/>
 								</div>
 								<div>
@@ -89,13 +108,27 @@ const ProfileSettings = () => {
 										value={values?.oldPassword}
 										placeholder="altes Passwort"
 										className="border border-slate-200 p-2 rounded-md block w-full"
+										onChange={(e) =>
+											setValues({
+												...values,
+												oldPassword: e.target.value,
+											})
+										}
 									/>
 								</div>
 								<div className="mt-16">
 									<label className="w-full text-xs uppercase text-slate-600 font-medium block">
 										Benutzerrolle
 									</label>
-									<select className="appearance-none border border-slate-200 p-2 rounded-md block w-full">
+									<select
+										className="appearance-none border border-slate-200 p-2 rounded-md block w-full"
+										onChange={(e) =>
+											setValues({
+												...values,
+												role: e.target.value,
+											})
+										}
+									>
 										<option value="admin">Admin</option>
 										<option value="user">User</option>
 									</select>

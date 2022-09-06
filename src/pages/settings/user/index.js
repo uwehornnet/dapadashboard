@@ -6,7 +6,7 @@ import Table from "../../../components/Table";
 import Pagination from "../../../components/Pagination";
 import { useFetch } from "../../../hooks/useFetch";
 
-const TableRow = ({ index, id, name, email, role, location }) => {
+const TableRow = ({ index, id, name, email, role }) => {
 	return (
 		<tr className={index % 2 === 0 ? null : "bg-gray-50"}>
 			<td className="px-6 py-4 whitespace-nowrap">
@@ -17,11 +17,6 @@ const TableRow = ({ index, id, name, email, role, location }) => {
 						<div className="text-sm text-gray-500">{email}</div>
 					</div>
 				</div>
-			</td>
-
-			<td className="px-6 py-4 whitespace-nowrap">
-				<div className="text-sm text-gray-900">{location?.name}</div>
-				<div className="text-sm text-gray-500">{location?.city}</div>
 			</td>
 
 			<td className="px-6 py-4 whitespace-nowrap">
@@ -79,19 +74,25 @@ function UserPage() {
 				<div>{JSON.stringify(error)}</div>
 			) : (
 				<div>
-					<Table head={["ID & Benutzer", "Standort", "Benutzerrolle"]}>
-						{data.data.map((link, i) => (
-							<TableRow key={i} index={i} {...link} />
-						))}
-					</Table>
+					{data.data.length ? (
+						<>
+							<Table head={["ID & Benutzer", "Benutzerrolle"]}>
+								{data.data.map((link, i) => (
+									<TableRow key={i} index={i} {...link} />
+								))}
+							</Table>
 
-					<div className="p-4">
-						<Pagination
-							{...data}
-							type="Benutzer"
-							onClick={(url) => setEndpoint(`/api/booking?${url.split("?")[1]}`)}
-						/>
-					</div>
+							<div className="p-4">
+								<Pagination
+									{...data}
+									type="Benutzer"
+									onClick={(url) => setEndpoint(`/api/booking?${url.split("?")[1]}`)}
+								/>
+							</div>
+						</>
+					) : (
+						<img src="/empty.jpg" className="mx-auto" />
+					)}
 				</div>
 			)}
 		</div>
