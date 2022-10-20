@@ -138,6 +138,7 @@ const UserCreatePage = () => {
 											}
 										>
 											<option value="admin">Admin</option>
+											<option value="fahrer">Fahrer</option>
 											<option value="user">User</option>
 										</select>
 									</div>

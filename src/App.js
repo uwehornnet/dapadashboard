@@ -6,18 +6,29 @@ const LoginPage = React.lazy(() => import("./pages/auth/login.js"));
 const HomePage = React.lazy(() => import("./pages/home/index.js"));
 const EntryCreatePage = React.lazy(() => import("./pages/entry/create.js"));
 const EntryUpdatePage = React.lazy(() => import("./pages/entry/update.js"));
-const InvoicePage = React.lazy(() => import("./pages/invoice/index.js"));
-const InvoiceCreatePage = React.lazy(() => import("./pages/invoice/create.js"));
-const InvoiceUpdatePage = React.lazy(() => import("./pages/invoice/update.js"));
+
+const InvoicePage = React.lazy(() => import("./pages/document/index.js"));
+const InvoiceCreatePage = React.lazy(() => import("./pages/document/invoice/create.js"));
+const InvoiceUpdatePage = React.lazy(() => import("./pages/document/invoice/update.js"));
+const CreditCreatePage = React.lazy(() => import("./pages/document/credit/create.js"));
+const CreditUpdatePage = React.lazy(() => import("./pages/document/credit/update.js"));
+const DisposalCreatePage = React.lazy(() => import("./pages/document/disposal/create.js"));
+const DisposalUpdatePage = React.lazy(() => import("./pages/document/disposal/update.js"));
+
 const UserPage = React.lazy(() => import("./pages/settings/user/index.js"));
 const UserCreatePage = React.lazy(() => import("./pages/settings/user/create.js"));
 const SettingsPage = React.lazy(() => import("./pages/settings/index.js"));
 const ProfileSettings = React.lazy(() => import("./pages/settings/profile/index.js"));
+
 const Locations = React.lazy(() => import("./pages/settings/location/index.js"));
 const LocationCreate = React.lazy(() => import("./pages/settings/location/create.js"));
+
 const CustomerPage = React.lazy(() => import("./pages/customer/index.js"));
 const CustomerCreatePage = React.lazy(() => import("./pages/customer/create.js"));
 const CustomerUpdatePage = React.lazy(() => import("./pages/customer/update.js"));
+
+const JobPage = React.lazy(() => import("./pages/job/index.js"));
+const JobEditPage = React.lazy(() => import("./pages/job/edit.js"));
 
 function App() {
 	return (
@@ -65,7 +76,7 @@ function App() {
 			/>
 			<Route
 				exact
-				path="/invoice"
+				path="/document"
 				element={
 					<React.Suspense fallback={<>...</>}>
 						<AppWrapper>
@@ -76,7 +87,7 @@ function App() {
 			/>
 			<Route
 				exact
-				path="/invoice/create"
+				path="/document/invoice/create"
 				element={
 					<React.Suspense fallback={<>...</>}>
 						<AppWrapper>
@@ -88,11 +99,82 @@ function App() {
 
 			<Route
 				exact
-				path="/invoice/update/:id"
+				path="/document/invoice/update/:id"
 				element={
 					<React.Suspense fallback={<>...</>}>
 						<AppWrapper>
 							<InvoiceUpdatePage />
+						</AppWrapper>
+					</React.Suspense>
+				}
+			/>
+			<Route
+				exact
+				path="/document/credit/create"
+				element={
+					<React.Suspense fallback={<>...</>}>
+						<AppWrapper>
+							<CreditCreatePage />
+						</AppWrapper>
+					</React.Suspense>
+				}
+			/>
+
+			<Route
+				exact
+				path="/document/credit/update/:id"
+				element={
+					<React.Suspense fallback={<>...</>}>
+						<AppWrapper>
+							<CreditUpdatePage />
+						</AppWrapper>
+					</React.Suspense>
+				}
+			/>
+
+			<Route
+				exact
+				path="/document/disposal/create"
+				element={
+					<React.Suspense fallback={<>...</>}>
+						<AppWrapper>
+							<DisposalCreatePage />
+						</AppWrapper>
+					</React.Suspense>
+				}
+			/>
+
+			<Route
+				exact
+				path="/document/disposal/update/:id"
+				element={
+					<React.Suspense fallback={<>...</>}>
+						<AppWrapper>
+							<DisposalUpdatePage />
+						</AppWrapper>
+					</React.Suspense>
+				}
+			/>
+
+			<Route
+				exact
+				path="/job"
+				element={
+					<React.Suspense fallback={<>...</>}>
+						<AppWrapper>
+							<JobPage />
+						</AppWrapper>
+					</React.Suspense>
+				}
+			/>
+
+			<Route
+				exact
+				path="/job/edit/:id"
+				element={
+					<React.Suspense fallback={<>...</>}>
+						<AppWrapper>
+							<JobEditPage />
 						</AppWrapper>
 					</React.Suspense>
 				}

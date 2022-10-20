@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Formik } from "formik";
-import { useFetch } from "../../hooks/useFetch";
-import { baseURI } from "../../utils/baseURI";
+import { useFetch } from "../../../hooks/useFetch";
+import { baseURI } from "../../../utils/baseURI";
 
-const InvoiceUpdatePage = () => {
+const CreditUpdatePage = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const [initialValues, setInitialValues] = useState({
 		status: "",
-		type: "",
+		type: "Gutschrift",
 		file: "",
 		customerId: "",
 		customer: "",
@@ -30,6 +30,7 @@ const InvoiceUpdatePage = () => {
 				description: "",
 			},
 		],
+		besteuerung: "",
 		total: 0,
 		tax: 0,
 		netto: 0,
@@ -37,7 +38,8 @@ const InvoiceUpdatePage = () => {
 
 	const [submitting, isSubmitting] = useState(false);
 	const [disabled, setDiabled] = useState(false);
-	const { loading, data: invoice, error } = useFetch({ endpoint: `/api/invoice/${id}` });
+	const [besteuerung, setBesteuerung] = useState(null);
+	const { loading, data: invoice, error } = useFetch({ endpoint: `/api/document/${id}` });
 
 	const handleFormSubmit = async (values) => {
 		try {
@@ -48,7 +50,7 @@ const InvoiceUpdatePage = () => {
 
 			// create document
 
-			const invoice = await fetch(`${baseURI}/api/invoice/update/${id}`, {
+			const invoice = await fetch(`${baseURI}/api/document/update/${id}`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -58,6 +60,7 @@ const InvoiceUpdatePage = () => {
 					subject: values.subject,
 					uid: values.uid,
 					date: values.date,
+					besteuerung: values.besteuerung,
 					headText: values.headText,
 					footText: values.footText,
 					items: values.items,
@@ -71,7 +74,7 @@ const InvoiceUpdatePage = () => {
 
 			window.alert(`Rechnung ${invoice.data.uid} wurde aktualisiert.`);
 			isSubmitting(false);
-			navigate("/invoice");
+			navigate("/document");
 		} catch (err) {
 			console.log(err);
 			isSubmitting(false);
@@ -80,9 +83,9 @@ const InvoiceUpdatePage = () => {
 
 	const fetchInvoiceAsync = async () => {
 		try {
-			const req = await fetch(`${baseURI}/api/invoice/${id}`);
+			const req = await fetch(`${baseURI}/api/document/${id}`);
 			const res = await req.json();
-
+			console.log({ res });
 			setInitialValues({
 				...initialValues,
 				...res.data.invoice,
@@ -94,8 +97,30 @@ const InvoiceUpdatePage = () => {
 			});
 
 			setDiabled(res.data.invoice.status === "saved");
+			setBesteuerung(res.data.besteuerung);
 		} catch (err) {
 			console.log(err);
+		}
+	};
+
+	const handleDelete = async () => {
+		try {
+			if (disabled) return;
+
+			const req = await fetch(`${baseURI}/api/document/delete/${id}`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
+			const res = await req.json();
+
+			window.alert(`Dokument wurde aus der Datenbank entfernt.`);
+			isSubmitting(false);
+			navigate("/document");
+		} catch (error) {
+			console.log(error);
+			isSubmitting(false);
 		}
 	};
 
@@ -115,23 +140,10 @@ const InvoiceUpdatePage = () => {
 								</span>
 								<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-16">
 									<div className="col-span-1">
-										<label className="text-sm mb-2 block">Typ</label>
-										<select
-											disabled={disabled}
-											name="type"
-											id="type"
-											value={values.type}
-											onChange={(e) => {
-												setValues({ ...values, type: e.target.value });
-											}}
-											className="p-2 bg-white border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none disabled:cursor-not-allowed disabled:text-zinc-300"
-										>
-											<option disabled value="">
-												bitte wählen
-											</option>
-											<option value="Gutschrift">Gutschrift</option>
-											<option value="Rechnung">Rechnung</option>
-										</select>
+										<div className="col-span-1">
+											<h1 className="text-2xl">Gutschrift</h1>
+											<p className="text-xs">Bearbeite deine Gutschrift</p>
+										</div>
 									</div>
 									<div className="col-span-1">
 										<label className="text-sm mb-2 block">Status</label>
@@ -150,6 +162,20 @@ const InvoiceUpdatePage = () => {
 											</option>
 											<option value="preview">Entwurf</option>
 											<option value="saved">Festgeschrieben</option>
+										</select>
+										<label className="text-sm mb-2 mt-4 block">Besteuerung</label>
+										<select
+											name="besteuerung"
+											id="besteuerung"
+											disabled={disabled}
+											value={values.besteuerung}
+											onChange={(e) => {
+												setValues({ ...values, besteuerung: e.target.value });
+											}}
+											className="p-2 bg-white border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none disabled:cursor-not-allowed disabled:text-zinc-300"
+										>
+											<option value="regelbesteuert">regelbesteuert</option>
+											<option value="differenzbesteuert">differenzbesteuert</option>
 										</select>
 									</div>
 								</div>
@@ -503,6 +529,29 @@ const InvoiceUpdatePage = () => {
 							</div>
 
 							<div className="w-full p-4 border-t border-slate-300 flex items-center justify-end">
+								{!disabled ? (
+									<button
+										disabled={disabled}
+										onClick={handleDelete}
+										className="px-4 py-3 mr-4 bg-red-200 text-red-700 hover:bg-red-600 hover:text-indigo-100 hover:shadow-lg shadow-sm rounded-md cursor-pointer flex items-center space-x-4 disabled:text-zinc-500 disabled:bg-zinc-200 disabled:cursor-not-allowed"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											fill="none"
+											viewBox="0 0 24 24"
+											strokeWidth={2}
+											stroke="currentColor"
+											className="w-5 h-5 mr-3"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+											/>
+										</svg>
+										löschen
+									</button>
+								) : null}
 								<button
 									disabled={disabled}
 									type="submit"
@@ -534,4 +583,4 @@ const InvoiceUpdatePage = () => {
 	);
 };
 
-export default InvoiceUpdatePage;
+export default CreditUpdatePage;

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Formik } from "formik";
-import { useFetch } from "../../hooks/useFetch";
-import { baseURI } from "../../utils/baseURI";
+import { useFetch } from "../../../hooks/useFetch";
+import { baseURI } from "../../../utils/baseURI";
 
-let initialValues = {
+let formValues = {
 	status: "",
-	type: "",
+	type: "Rechnung",
 	file: "",
 	customerId: "",
 	customer: "",
@@ -27,6 +27,7 @@ let initialValues = {
 			description: "",
 		},
 	],
+	besteuerung: "",
 	total: 0,
 	tax: 0,
 	netto: 0,
@@ -35,8 +36,13 @@ let initialValues = {
 const InvoiceCreatePage = () => {
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
-	const [submitting, isSubmitting] = useState(false);
+	const [entry, setEntry] = useState(null);
 	const [modal, showModal] = useState(false);
+	const [initialValues, setInitialValues] = useState(formValues);
+	const [besteuerung, setBesteuerung] = useState(null);
+
+	const [submitting, isSubmitting] = useState(false);
+
 	const { loading, data: location, error } = useFetch({ endpoint: "/api/location" });
 	const { loading: customerLoading, data: customer, eror: customerError } = useFetch({ endpoint: "/api/customer" });
 
@@ -67,7 +73,7 @@ const InvoiceCreatePage = () => {
 
 			// create document
 
-			const invoice = await fetch(`${baseURI}/api/invoice/create`, {
+			const invoice = await fetch(`${baseURI}/api/document/create`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -77,6 +83,7 @@ const InvoiceCreatePage = () => {
 					type: values.type,
 					subject: values.subject,
 					uid: values.uid,
+					besteuerung: values.besteuerung,
 					date: values.date,
 					headText: values.headText,
 					footText: values.footText,
@@ -87,9 +94,9 @@ const InvoiceCreatePage = () => {
 				}),
 			}).then((res) => res.json());
 
-			window.alert(`Rechnung ${invoice.data.uid} wurde erstellt.`);
+			window.alert(`Rechnung wurde erstellt.`);
 			isSubmitting(false);
-			navigate("/invoice");
+			navigate("/document");
 		} catch (err) {
 			console.log(err);
 			isSubmitting(false);
@@ -100,9 +107,28 @@ const InvoiceCreatePage = () => {
 		const req = await fetch(`${baseURI}/api/entry/${id}`);
 		const res = await req.json();
 		const data = JSON.parse(res.data.data);
-		initialValues.file = id;
-		initialValues.items[0].position = `${data?.hersteller} ${data?.typ}`;
-		initialValues.items[0].description = `Hersteller: ${data?.hersteller}\nTyp: ${data?.typ}\nZulassung: ${data?.zulassung}\nSchlüsselnummer: ${data?.schluesselnummer}\nKraftstoff: ${data?.kraftstoff}\nHubraum: ${data?.hubraum}\nLeistung: ${data?.leistung}\nLeergewicht: ${data?.leergewicht}\nKFZ-Brief: ${data?.kfzbrief}`;
+		setEntry(data);
+		setInitialValues({
+			...initialValues,
+			file: id,
+			besteuerung: data.besteuerung,
+			footText: `${
+				data.besteuerung === "regelbesteuert"
+					? ""
+					: "Dieser Umsatz unterliegt der Differenzbesteuerung nach §25a UStG.\n\n"
+			}${initialValues.footText}`,
+			items: [
+				{
+					qty: 1,
+					price: 0,
+					total: 0,
+					position: `${data?.fahrzeug?.marke} ${data?.fahrzeug?.modell}`,
+					description: `Hersteller: ${data?.fahrzeug?.marke}\nTyp: ${data?.fahrzeug?.modell}\nZulassung: ${data?.fahrzeug?.zulassung}\nSchlüsselnummer: ${data?.fahrzeug?.identnummer}\nKraftstoff: ${data?.fahrzeug?.kraftstoff}\nHubraum: ${data?.fahrzeug?.hubraum}\nLeistung: ${data?.fahrzeug?.leistung}\nLeergewicht: ${data?.fahrzeug?.gewicht}\nKFZ-Brief: ${data?.fahrzeug?.kfzbrief}`,
+				},
+			],
+		});
+
+		setBesteuerung(data.besteuerung);
 	};
 
 	useEffect(() => {
@@ -112,7 +138,7 @@ const InvoiceCreatePage = () => {
 	}, [searchParams]);
 
 	return (
-		<Formik initialValues={initialValues} onSubmit={handleFormSubmit}>
+		<Formik initialValues={initialValues} onSubmit={handleFormSubmit} enableReinitialize>
 			{({ handleSubmit, setValues, values, setErrors, errors }) => (
 				<div className="w-full h-full flex flex-col justify-start">
 					{modal && (
@@ -185,19 +211,8 @@ const InvoiceCreatePage = () => {
 								</span>
 								<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-16">
 									<div className="col-span-1">
-										<label className="text-sm mb-2 block">Typ</label>
-										<select
-											name="type"
-											id="type"
-											value={values.type}
-											onChange={(e) => {
-												setValues({ ...values, type: e.target.value });
-											}}
-											className="p-2 bg-white border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
-										>
-											<option value="Gutschrift">Gutschrift</option>
-											<option value="Rechnung">Rechnung</option>
-										</select>
+										<h1 className="text-2xl">Rechnung</h1>
+										<p className="text-xs">Erstelle eine neue Rechnung</p>
 									</div>
 									<div className="col-span-1">
 										<label className="text-sm mb-2 block">Status</label>
@@ -212,6 +227,21 @@ const InvoiceCreatePage = () => {
 										>
 											<option value="preview">Entwurf</option>
 											<option value="saved">Festgeschrieben</option>
+										</select>
+
+										<label className="text-sm mb-2 mt-4 block">Besteuerung</label>
+										<select
+											name="besteuerung"
+											id="besteuerung"
+											value={values.besteuerung}
+											onChange={(e) => {
+												setValues({ ...values, besteuerung: e.target.value });
+												setBesteuerung(e.target.value);
+											}}
+											className="p-2 bg-white border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
+										>
+											<option value="regelbesteuert">regelbesteuert</option>
+											<option value="differenzbesteuert">differenzbesteuert</option>
 										</select>
 									</div>
 								</div>
@@ -259,12 +289,20 @@ const InvoiceCreatePage = () => {
 									</div>
 									<div className="col-span-1">
 										<label className="text-sm mb-2 block">Betreff</label>
-										<input
-											type="text"
+										<select
+											name="status"
+											id="status"
 											value={values.subject}
-											onChange={(e) => setValues({ ...values, subject: e.target.value })}
-											className="p-2 bg-transparent border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
-										/>
+											onChange={(e) => {
+												setValues({ ...values, subject: e.target.value });
+											}}
+											className="p-2 bg-white border border-neutral-200 block w-full rounded-sm focus:ring-0 focus:outline-none"
+										>
+											<option value="Ankauf">Ankauf</option>
+											<option value="Export">Export</option>
+											<option value="Fuhrpark">Fuhrpark</option>
+											<option value="Verkauf">Verkauf</option>
+										</select>
 
 										<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
 											<div className="col-span-1">
@@ -376,8 +414,14 @@ const InvoiceCreatePage = () => {
 																		}),
 																	],
 																	total: t,
-																	tax: t * 1.19 - t,
-																	netto: t * 1.19,
+																	tax:
+																		besteuerung === "regelbesteuert"
+																			? t * 1.19 - t
+																			: t * 1 - t,
+																	netto:
+																		besteuerung === "regelbesteuert"
+																			? t * 1.19
+																			: t * 1,
 																});
 															}}
 															onChange={(e) => {
@@ -426,8 +470,14 @@ const InvoiceCreatePage = () => {
 																		}),
 																	],
 																	total: t,
-																	tax: t * 1.19 - t,
-																	netto: t * 1.19,
+																	tax:
+																		besteuerung === "regelbesteuert"
+																			? t * 1.19 - t
+																			: t * 1 - t,
+																	netto:
+																		besteuerung === "regelbesteuert"
+																			? t * 1.19
+																			: t * 1,
 																});
 															}}
 															onChange={(e) => {
@@ -470,8 +520,14 @@ const InvoiceCreatePage = () => {
 																	...values,
 																	items: values.items.filter((_, i) => i !== index),
 																	total: t,
-																	tax: t * 1.19 - t,
-																	netto: t * 1.19,
+																	tax:
+																		besteuerung === "regelbesteuert"
+																			? t * 1.19 - t
+																			: t * 1 - t,
+																	netto:
+																		besteuerung === "regelbesteuert"
+																			? t * 1.19
+																			: t * 1,
 																});
 															}}
 														>
@@ -565,11 +621,17 @@ const InvoiceCreatePage = () => {
 								</div>
 								<div className="border-b border-neutral-300 flex items-center justify-between p-3">
 									<p>Umsatzsteuer</p>
-									<p>{values.tax.toFixed(2)} Euro</p>
+									<p>{besteuerung === "differenzbesteuert" ? "0.00" : values.tax.toFixed(2)} Euro</p>
 								</div>
+
 								<div className="flex items-center justify-between p-3 text-lg font-medium">
 									<p>Gesamt</p>
-									<p>{values.netto.toFixed(2)} Euro</p>
+									<p>
+										{besteuerung === "differenzbesteuert"
+											? values.total.toFixed(2)
+											: values.netto.toFixed(2)}{" "}
+										Euro
+									</p>
 								</div>
 							</div>
 

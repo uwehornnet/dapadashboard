@@ -74,7 +74,7 @@ function UserPage() {
 				<div>{JSON.stringify(error)}</div>
 			) : (
 				<div>
-					{data.data.length ? (
+					{data?.data.length ? (
 						<>
 							<Table head={["ID & Benutzer", "Benutzerrolle"]}>
 								{data.data.map((link, i) => (

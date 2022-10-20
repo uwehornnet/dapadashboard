@@ -1,3 +1,3 @@
 export const locations = ["-", "Stralsund", "Rügen", "Duvendiek"];
 
-export const status = ["-", "Verkauf", "Schrott", "Bestand"];
+export const status = ["Bestand", "Fuhrpark", "Verwertung", "Verkauf"];

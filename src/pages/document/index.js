@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import ActivityIndicator from "../../components/ActivityIndicator";
@@ -8,6 +8,24 @@ import { useFetch } from "../../hooks/useFetch";
 import { baseURI } from "../../utils/baseURI";
 
 const TableRow = ({ index, id, uid, total, customer, status, type }) => {
+	const [endpoint, setEndpoint] = useState("");
+
+	useEffect(() => {
+		switch (type) {
+			case "Rechnung":
+				setEndpoint(`/document/invoice/update/${id}`);
+				break;
+			case "Gutschrift":
+				setEndpoint(`/document/credit/update/${id}`);
+				break;
+			case "Verwertung":
+				setEndpoint(`/document/disposal/update/${id}`);
+				break;
+			default:
+				break;
+		}
+	}, [type, id]);
+
 	return (
 		<tr className={index % 2 === 0 ? null : "bg-gray-50"}>
 			<td className="px-6 py-4 whitespace-nowrap">
@@ -25,7 +43,7 @@ const TableRow = ({ index, id, uid, total, customer, status, type }) => {
 			</td>
 
 			<td className="px-6 py-4 whitespace-nowrap">
-				<div className="text-sm text-gray-900">{total.toFixed(2)} EUR</div>
+				<div className="text-sm text-gray-900">{total ? `${total.toFixed(2)} EUR` : "-"}</div>
 			</td>
 
 			<td className="px-6 py-4 whitespace-nowrap">
@@ -52,7 +70,7 @@ const TableRow = ({ index, id, uid, total, customer, status, type }) => {
 			</td>
 			<td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex items-center justify-end">
 				<a
-					href={`${baseURI}/api/invoice/pdf/${id}`}
+					href={`${baseURI}/api/document/pdf/${id}`}
 					target="_blank"
 					className="text-zinc-400 hover:text-indigo-900 hover:bg-zinc-100 p-2 rounded-md"
 				>
@@ -72,10 +90,7 @@ const TableRow = ({ index, id, uid, total, customer, status, type }) => {
 						<path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
 					</svg>
 				</a>
-				<Link
-					to={"/invoice/update/" + id}
-					className="text-zinc-400 hover:text-indigo-900 hover:bg-zinc-100 p-2 rounded-md"
-				>
+				<Link to={endpoint} className="text-zinc-400 hover:text-indigo-900 hover:bg-zinc-100 p-2 rounded-md">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						fill="none"
@@ -97,7 +112,7 @@ const TableRow = ({ index, id, uid, total, customer, status, type }) => {
 };
 
 function InvoicePage() {
-	const [endpoint, setEndpoint] = useState(`/api/invoice`);
+	const [endpoint, setEndpoint] = useState(`/api/document`);
 	const { loading, error, data } = useFetch({ endpoint });
 	console.log({ data });
 	return (
@@ -105,28 +120,9 @@ function InvoicePage() {
 			<div className="border border-slate-300 rounded-lg  mx-auto bg-white">
 				<div className="p-4 border-b border-zinc-300 flex items-center justify-between">
 					<div>
-						<h2 className="text-xl">Rechnungen</h2>
-						<p className="text-slate-400">Übersicht aller Rechnungen</p>
+						<h2 className="text-xl">Dokumente</h2>
+						<p className="text-slate-400">Übersicht aller Dokumente</p>
 					</div>
-					<Link to="/invoice/create">
-						<button className="flex items-center gap-2 cursor-pointer hover:bg-slate-100 px-6 py-3 rounded-lg">
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								fill="none"
-								viewBox="0 0 24 24"
-								strokeWidth={1.5}
-								stroke="currentColor"
-								className="w-6 h-6"
-							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									d="M13.5 16.875h3.375m0 0h3.375m-3.375 0V13.5m0 3.375v3.375M6 10.5h2.25a2.25 2.25 0 002.25-2.25V6a2.25 2.25 0 00-2.25-2.25H6A2.25 2.25 0 003.75 6v2.25A2.25 2.25 0 006 10.5zm0 9.75h2.25A2.25 2.25 0 0010.5 18v-2.25a2.25 2.25 0 00-2.25-2.25H6a2.25 2.25 0 00-2.25 2.25V18A2.25 2.25 0 006 20.25zm9.75-9.75H18a2.25 2.25 0 002.25-2.25V6A2.25 2.25 0 0018 3.75h-2.25A2.25 2.25 0 0013.5 6v2.25a2.25 2.25 0 002.25 2.25z"
-								/>
-							</svg>
-							neue Rechnung
-						</button>
-					</Link>
 				</div>
 				{loading ? (
 					<div className="p-8">
@@ -147,8 +143,8 @@ function InvoicePage() {
 								<div className="p-4">
 									<Pagination
 										{...data}
-										type="Rechnungen"
-										onClick={(url) => setEndpoint(`/api/invoice?${url.split("?")[1]}`)}
+										type="Dokumente"
+										onClick={(url) => setEndpoint(`/api/document?${url.split("?")[1]}`)}
 									/>
 								</div>
 							</>
