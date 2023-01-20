@@ -53,7 +53,7 @@ const InvoiceUpdatePage = () => {
 			const invoice = await fetch(`${baseURI}/api/document/update/${id}`, {
 				method: "POST",
 				headers: {
-					"Content-Type": "application/json",
+					"Content-Type": "application/text",
 				},
 				body: JSON.stringify({
 					customer: values.customerId,

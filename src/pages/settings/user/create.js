@@ -11,7 +11,7 @@ const UserCreatePage = () => {
 		const req = await fetch(`${baseURI}/api/user/create`, {
 			method: "POST",
 			headers: {
-				"Content-Type": "application/json",
+				"Content-Type": "application/text",
 			},
 			body: JSON.stringify(values),
 		});

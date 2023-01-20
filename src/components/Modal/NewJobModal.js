@@ -19,6 +19,7 @@ const initialValues = {
 		plz: "",
 		ort: "",
 	},
+	bemerkung: "",
 };
 
 const NewJobModal = ({ visible, showModal }) => {
@@ -32,7 +33,7 @@ const NewJobModal = ({ visible, showModal }) => {
 		const req = await fetch(`${baseURI}/api/job/create`, {
 			method: "POST",
 			headers: {
-				"Content-Type": "application/json",
+				"Content-Type": "application/text",
 			},
 			body: JSON.stringify({
 				...values,
@@ -278,6 +279,30 @@ const NewJobModal = ({ visible, showModal }) => {
 																	...values.standort,
 																	ort: e.target.value,
 																},
+															})
+														}
+														className="p-2 bg-white block w-full focus:ring-0 focus:outline-none"
+													/>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<div className="w-full border-b border-dashed border-neutral-300 p-4">
+										<span className="bg-zinc-200 p-1 text-zinc-600 text-xs mt-6 mb-2 inline-block">
+											Bemerkungen
+										</span>
+
+										<div className="flex gap-4 w-full">
+											<div className="flex-1">
+												<label className="text-sm  block mt-2">Strasse</label>
+												<div className="flex items-center border border-neutral-200 rounded-sm">
+													<textarea
+														value={values.bemerkung}
+														onChange={(e) =>
+															setValues({
+																...values,
+																bemerkung: e.target.value,
 															})
 														}
 														className="p-2 bg-white block w-full focus:ring-0 focus:outline-none"

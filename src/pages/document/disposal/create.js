@@ -90,7 +90,7 @@ const DisposalCreatePage = () => {
 			const customerReq = await fetch(`${baseURI}/api/customer/create`, {
 				method: "POST",
 				headers: {
-					"Content-Type": "application/json",
+					"Content-Type": "application/text",
 				},
 				body: JSON.stringify({
 					name: `${values.annahme.name}`,
@@ -119,7 +119,7 @@ const DisposalCreatePage = () => {
 			const beleg = await fetch(`${baseURI}/api/document/create`, {
 				method: "POST",
 				headers: {
-					"Content-Type": "application/json",
+					"Content-Type": "application/text",
 				},
 				body: JSON.stringify(payload),
 			}).then((res) => res.json());

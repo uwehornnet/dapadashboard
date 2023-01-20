@@ -92,7 +92,7 @@ const DisposalUpdatePage = () => {
 			const customerReq = await fetch(`${baseURI}/api/customer/create`, {
 				method: "POST",
 				headers: {
-					"Content-Type": "application/json",
+					"Content-Type": "application/text",
 				},
 				body: JSON.stringify({
 					name: `${values.annahme.name}`,
@@ -120,7 +120,7 @@ const DisposalUpdatePage = () => {
 			const beleg = await fetch(`${baseURI}/api/document/update/${id}`, {
 				method: "POST",
 				headers: {
-					"Content-Type": "application/json",
+					"Content-Type": "application/text",
 				},
 				body: JSON.stringify(payload),
 			}).then((res) => res.json());
@@ -1166,7 +1166,6 @@ const DisposalUpdatePage = () => {
 							<div className="w-full p-4 border-t border-slate-300 flex items-center justify-end">
 								<button
 									type="submit"
-									disabled={values.status === "saved"}
 									onClick={handleSubmit}
 									className="px-4 py-3 bg-indigo-200 text-indigo-700 hover:bg-indigo-600 hover:text-indigo-100 hover:shadow-lg shadow-sm rounded-md cursor-pointer flex items-center space-x-4"
 								>

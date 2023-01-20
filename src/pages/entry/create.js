@@ -71,7 +71,7 @@ function EntryCreatePage() {
 			const req = await fetch(`${baseURI}/api/entry/create/`, {
 				method: "POST",
 				headers: {
-					"Content-Type": "application/json",
+					"Content-Type": "application/text",
 				},
 				body: JSON.stringify({
 					data: values,

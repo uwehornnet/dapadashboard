@@ -5,8 +5,8 @@ export const postAsync = async ({ action, payload }) => {
 	const response = await fetch(`${baseURI}${action}`, {
 		method: "POST",
 		headers: {
-			Accept: "application/json",
-			"Content-Type": "application/json",
+			Accept: "application/text",
+			"Content-Type": "application/text",
 			Authorization: `Bearer ${token}`,
 		},
 		body: JSON.stringify(payload),
