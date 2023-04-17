@@ -16,7 +16,6 @@ export const useFetch = ({ endpoint, payload }) => {
 			setLoading(true);
 			const req = await fetch(`${baseURI}${endpoint}`, {
 				method: "GET",
-				headers: headersList,
 			});
 			const res = await req.json();
 			if (res.ok) {

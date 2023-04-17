@@ -33,7 +33,7 @@ const NewJobModal = ({ visible, showModal }) => {
 		const req = await fetch(`${baseURI}/api/job/create`, {
 			method: "POST",
 			headers: {
-				"Content-Type": "application/text",
+				"Content-Type": "application/json",
 			},
 			body: JSON.stringify({
 				...values,

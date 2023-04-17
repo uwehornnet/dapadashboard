@@ -10,7 +10,7 @@ const CustomerCreatePage = () => {
 		const req = await fetch(`${baseURI}/api/customer/create`, {
 			method: "POST",
 			headers: {
-				"Content-Type": "application/text",
+				"Content-Type": "application/json",
 			},
 			body: JSON.stringify(values),
 		});

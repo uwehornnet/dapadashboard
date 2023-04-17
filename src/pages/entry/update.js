@@ -70,7 +70,7 @@ function EntryUpdatePage() {
 			const req = await fetch(`${baseURI}/api/entry/update/${id}`, {
 				method: "POST",
 				headers: {
-					"Content-Type": "application/text",
+					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
 					data: values,

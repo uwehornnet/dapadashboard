@@ -11,6 +11,7 @@ import NewEntryModal from "../../components/Modal/NewEntryModal";
 const TableRow = ({ index, id, data, invoice, setModalEntry }) => {
 	const navigate = useNavigate();
 	const { fahrzeug, status, standort } = data ? JSON.parse(data) : {};
+
 	return (
 		<tr className={index % 2 === 0 ? null : "bg-gray-50"}>
 			<td className="px-6 py-4 whitespace-nowrap">
@@ -20,15 +21,15 @@ const TableRow = ({ index, id, data, invoice, setModalEntry }) => {
 			</td>
 
 			<td className="px-6 py-4 whitespace-nowrap">
-				<div className="text-sm text-gray-900">{fahrzeug.kennzeichen || "-"}</div>
+				<div className="text-sm text-gray-900">{fahrzeug?.kennzeichen || "-"}</div>
 			</td>
 
 			<td className="px-6 py-4 whitespace-nowrap">
-				<div className="text-sm text-gray-900">{`${fahrzeug.marke || "-"} ${fahrzeug.modell || ""}`}</div>
+				<div className="text-sm text-gray-900">{`${fahrzeug?.marke || "-"} ${fahrzeug?.modell || ""}`}</div>
 			</td>
 
 			<td className="px-6 py-4 whitespace-nowrap">
-				<div className="text-sm text-gray-900">{fahrzeug.kraftstoff || "-"}</div>
+				<div className="text-sm text-gray-900">{fahrzeug?.kraftstoff || "-"}</div>
 			</td>
 
 			<td className="px-6 py-4 whitespace-nowrap">

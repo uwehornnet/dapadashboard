@@ -53,7 +53,7 @@ const CreditUpdatePage = () => {
 			const invoice = await fetch(`${baseURI}/api/document/update/${id}`, {
 				method: "POST",
 				headers: {
-					"Content-Type": "application/text",
+					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
 					customer: values.customerId,
@@ -110,7 +110,7 @@ const CreditUpdatePage = () => {
 			const req = await fetch(`${baseURI}/api/document/delete/${id}`, {
 				method: "POST",
 				headers: {
-					"Content-Type": "application/text",
+					"Content-Type": "application/json",
 				},
 			});
 			const res = await req.json();

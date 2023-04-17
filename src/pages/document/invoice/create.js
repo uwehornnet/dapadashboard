@@ -58,7 +58,7 @@ const InvoiceCreatePage = () => {
 				const customerReq = await fetch(`${baseURI}/api/customer/create`, {
 					method: "POST",
 					headers: {
-						"Content-Type": "application/text",
+						"Content-Type": "application/json",
 					},
 					body: JSON.stringify({
 						name: values.customer,
@@ -76,7 +76,7 @@ const InvoiceCreatePage = () => {
 			const invoice = await fetch(`${baseURI}/api/document/create`, {
 				method: "POST",
 				headers: {
-					"Content-Type": "application/text",
+					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
 					customer: customer,

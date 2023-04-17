@@ -68,10 +68,26 @@ function EntryCreatePage() {
 				path = uploadRes.data.path;
 			}
 
-			const req = await fetch(`${baseURI}/api/entry/create/`, {
+
+			const formData = new FormData();
+			formData.append("data", JSON.stringify(values));
+			formData.append("filename", filename);
+			formData.append("path", path);
+			formData.append("location", values.standort);
+			formData.append("status", values.status);
+
+			const jsonValues = JSON.stringify({
+				data: values,
+				filename,
+				path,
+				location: values.standort,
+				status: values.status,
+			});
+
+			const req = await fetch(`${baseURI}/api/entry/create`, {
 				method: "POST",
 				headers: {
-					"Content-Type": "application/text",
+					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
 					data: values,

@@ -114,7 +114,7 @@ const TableRow = ({ index, id, uid, total, customer, status, type }) => {
 function InvoicePage() {
 	const [endpoint, setEndpoint] = useState(`/api/document`);
 	const { loading, error, data } = useFetch({ endpoint });
-	console.log({ data });
+
 	return (
 		<div className="p-4">
 			<div className="border border-slate-300 rounded-lg  mx-auto bg-white">

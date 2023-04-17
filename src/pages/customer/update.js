@@ -23,7 +23,7 @@ const CustomerUpdatePage = () => {
 			const req = await fetch(`${baseURI}/api/customer/update/${id}`, {
 				method: "POST",
 				headers: {
-					"Content-Type": "application/text",
+					"Content-Type": "application/json",
 				},
 				body: JSON.stringify(values),
 			});

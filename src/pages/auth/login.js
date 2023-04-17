@@ -15,8 +15,8 @@ const LoginPage = () => {
 			const res = await fetch(`${baseURI}/auth/login`, {
 				method: "POST",
 				headers: {
-					Accept: "application/text",
-					"Content-Type": "application/text",
+					Accept: "application/json",
+					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
 					email,
