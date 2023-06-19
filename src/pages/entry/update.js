@@ -47,6 +47,8 @@ function EntryUpdatePage() {
 	const { loading, error, data: entry } = useFetch({ endpoint: `/api/entry/${id}` });
 	const [initialValues, setInitialValues] = useState(formValues);
 
+	const [filename, setFilename] = useState("");
+
 	const handleSubmitAsync = async (values) => {
 		try {
 			if (fetching) return;
@@ -110,8 +112,6 @@ function EntryUpdatePage() {
 			}
 		})();
 	}, []);
-
-	console.log({ initialValues, entry });
 
 	return (
 		<div className="w-full h-full">
@@ -216,14 +216,44 @@ function EntryUpdatePage() {
 																...values,
 																file: e.target.files[0],
 															});
+															setFilename(e.target.files[0].name);
 														}}
 														className="form-control hidden"
 													/>
-													<img
-														src={`http://${entry?.filename}`}
-														alt={entry?.filename}
-														className="w-full h-auto 16/9"
-													/>
+													<div className="flex items-center justify-between gap-8 w-full">
+														{filename !== "" ? (
+															<span>{filename}</span>
+														) : (
+															<a
+																target="_blank"
+																rel="noreferrer"
+																className="underline"
+																href={`http://${entry?.filename}`}
+															>
+																{`http://${entry?.filename}`}
+															</a>
+														)}
+
+														<span className="text-blue-900 flex items-center bg-blue-100/50 rounded-md border-2 border-blue-900 py-2 px-4 cursor-pointer">
+															<svg
+																xmlns="http://www.w3.org/2000/svg"
+																fill="none"
+																viewBox="0 0 24 24"
+																strokeWidth={1.5}
+																stroke="currentColor"
+																className="w-6 h-6"
+															>
+																<path
+																	strokeLinecap="round"
+																	strokeLinejoin="round"
+																	d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"
+																/>
+															</svg>
+															<span className="hidden lg:block">
+																anderes Dokument auswählen
+															</span>
+														</span>
+													</div>
 												</label>
 											) : (
 												<label className="w-full min-h-[240px] h-[100%] bg-blue-100/50 rounded-md border-4 border-blue-900/60 border-dashed flex items-center justify-center cursor-copy">
@@ -236,6 +266,7 @@ function EntryUpdatePage() {
 																...values,
 																file: e.target.files[0],
 															});
+															setFilename(e.target.files[0].name);
 														}}
 														className="form-control hidden"
 													/>
@@ -254,7 +285,11 @@ function EntryUpdatePage() {
 																d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"
 															/>
 														</svg>
-														upload file
+														{filename !== "" ? (
+															<span>{filename}</span>
+														) : (
+															<span>upload file</span>
+														)}
 													</span>
 												</label>
 											)}
