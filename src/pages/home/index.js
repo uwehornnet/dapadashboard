@@ -117,7 +117,7 @@ function HomePage() {
 
 	return (
 		<>
-			<NewEntryModal visible={modal} onClose={handleModalClose} id={modal} />
+			<NewEntryModal visible={modal} onClose={handleModalClose} id={modal} onBack={() => showModal(false)} />
 			<div className="p-4">
 				<div className="border border-slate-300 rounded-lg  mx-auto bg-white">
 					<div className="p-4 border-b border-zinc-300 flex items-center justify-between">

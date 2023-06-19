@@ -18,15 +18,35 @@ const options = [
 	},
 ];
 
-const NewEntryModal = ({ visible, onClose, id }) => {
+const NewEntryModal = ({ visible, onClose, id, onBack }) => {
 	const [current, setCurrent] = useState(null);
 	return visible ? (
 		<div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50">
 			<div className="ml-auto mr-0 h-full lg:w-1/3 w-full shadow-lg rounded-tl-xl rounded-bl-xl overflow-hidden bg-white">
-				<div className="p-8 bg-indigo-700">
-					<div className="font-medium text-white uppercase">Dokument anlegen</div>
-					<div className="text-sm text-white">
-						Welche Arte von Dokument möchtest du zum ausgewählten Fahrzeug erstellen?
+				<div className="p-8 bg-indigo-700 relative">
+					<div className="flex items-center justify-between gap-4">
+						<span className="cursor-pointer text-white" onClick={onBack}>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								strokeWidth={1.5}
+								stroke="currentColor"
+								className="w-6 h-6"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"
+								/>
+							</svg>
+						</span>
+						<div className="flex-1">
+							<div className="font-medium text-white uppercase">Dokument anlegen</div>
+							<div className="text-sm text-white">
+								Welche Arte von Dokument möchtest du zum ausgewählten Fahrzeug erstellen?
+							</div>
+						</div>
 					</div>
 				</div>
 
