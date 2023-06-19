@@ -43,7 +43,24 @@ const TableRow = ({ index, id, data, invoice, setModalEntry }) => {
 			</td>
 
 			<td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-end items-center space-x-4 text-slate-500">
-				{status !== "Rechnung" && status !== "Verwertung" ? (
+				{invoice ? (
+					<Link to={`/document/?s=${id}`} className={`cursor-pointer hover:text-slate-900`}>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							strokeWidth={2}
+							stroke="currentColor"
+							className="w-5 h-5"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
+							/>
+						</svg>
+					</Link>
+				) : (
 					<span className={`cursor-pointer hover:text-slate-900`} onClick={() => setModalEntry(id)}>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -60,27 +77,6 @@ const TableRow = ({ index, id, data, invoice, setModalEntry }) => {
 							/>
 						</svg>
 					</span>
-				) : (
-					<a
-						href={`${baseURI}/api/document/pdf/${invoice}`}
-						target="_blank"
-						className={`cursor-pointer hover:text-slate-900`}
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							strokeWidth={2}
-							stroke="currentColor"
-							className="w-5 h-5"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
-							/>
-						</svg>
-					</a>
 				)}
 				<Link to={`/entry/update/${id}`}>
 					<span className="cursor-pointer hover:text-slate-900">

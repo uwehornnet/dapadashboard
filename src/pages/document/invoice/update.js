@@ -85,6 +85,7 @@ const InvoiceUpdatePage = () => {
 		try {
 			const req = await fetch(`${baseURI}/api/document/${id}`);
 			const res = await req.json();
+			console.log({ res });
 
 			setInitialValues({
 				...initialValues,

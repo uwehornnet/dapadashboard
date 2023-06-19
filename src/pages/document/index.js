@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 
 import ActivityIndicator from "../../components/ActivityIndicator";
 import Table from "../../components/Table";
@@ -112,7 +112,10 @@ const TableRow = ({ index, id, uid, total, customer, status, type }) => {
 };
 
 function InvoicePage() {
-	const [endpoint, setEndpoint] = useState(`/api/document`);
+	const [searchParams] = useSearchParams();
+	const [endpoint, setEndpoint] = useState(
+		`/api/document${searchParams.get("s") ? `?s=${searchParams.get("s")}` : ""}`
+	);
 	const { loading, error, data } = useFetch({ endpoint });
 
 	return (
