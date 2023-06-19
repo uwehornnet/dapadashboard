@@ -54,6 +54,7 @@ function EntryUpdatePage() {
 			let filename = "";
 			let path = "";
 			if (values.file && values.file.length !== 0) {
+				console.log({ values });
 				const formData = new FormData();
 				formData.append("file", values.file);
 
@@ -62,6 +63,7 @@ function EntryUpdatePage() {
 					body: formData,
 				});
 				const uploadRes = await uploadReq.json();
+				console.log({ uploadRes });
 
 				filename = uploadRes.data.filename;
 				path = uploadRes.data.path;
@@ -93,7 +95,6 @@ function EntryUpdatePage() {
 
 	useEffect(() => {
 		if (entry) {
-			console.log({ ...initialValues, ...JSON.parse(entry.data) });
 			setInitialValues({ ...initialValues, ...JSON.parse(entry.data) });
 		}
 	}, [entry]);
@@ -109,6 +110,8 @@ function EntryUpdatePage() {
 			}
 		})();
 	}, []);
+
+	console.log({ initialValues, entry });
 
 	return (
 		<div className="w-full h-full">
@@ -203,13 +206,25 @@ function EntryUpdatePage() {
 										</div>
 										<div className="w-full border-b border-dashed border-neutral-300 p-4">
 											{entry.filename ? (
-												<div className="border border-zinc-200 p-4 flex items-center justify-center bg-white">
+												<label className="border border-zinc-200 p-4 flex items-center justify-center bg-white">
+													<input
+														id="file"
+														name="file"
+														type="file"
+														onChange={(e) => {
+															setValues({
+																...values,
+																file: e.target.files[0],
+															});
+														}}
+														className="form-control hidden"
+													/>
 													<img
 														src={`http://${entry?.filename}`}
 														alt={entry?.filename}
 														className="w-full h-auto 16/9"
 													/>
-												</div>
+												</label>
 											) : (
 												<label className="w-full min-h-[240px] h-[100%] bg-blue-100/50 rounded-md border-4 border-blue-900/60 border-dashed flex items-center justify-center cursor-copy">
 													<input
