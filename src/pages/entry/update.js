@@ -286,7 +286,7 @@ function EntryUpdatePage() {
 															/>
 														</svg>
 														{filename !== "" ? (
-															<span>{filename}</span>
+															<span>{`speichern, um ${filename} hochzuladen`}</span>
 														) : (
 															<span>upload file</span>
 														)}
